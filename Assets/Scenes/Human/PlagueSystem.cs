@@ -10,11 +10,13 @@ public class PlagueSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        Material tmpMaterial = material;
         Entities.ForEach((ref PlagueComponent pc) =>
         {
             if (pc.infectionProb % 2 == 0)
-                
+            {
+
+            }
+
         }).Schedule();
     }
 }

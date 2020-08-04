@@ -10,7 +10,8 @@ public class Grid
         Road,
         Pub,
         Park,
-        Home
+        Home,
+        Supermarket
     }
 
 
@@ -58,8 +59,8 @@ public class Grid
                     else
                     {
 
-                        // 1-> house, 2-> park, 3-> pub
-                        int random = Random.Range(1, 4);
+                        // 1-> house, 2-> park, 3-> pub, 4->supermarket
+                        int random = Random.Range(1, 5);
                         if (random == 1)
                         {
                             gridArray.SetValue(TileMapSprite.Home, i, j);
@@ -73,6 +74,11 @@ public class Grid
                         else if (random == 3)
                         {
                             gridArray.SetValue(TileMapSprite.Pub, i, j);
+
+                        }
+                        else if (random == 4)
+                        {
+                            gridArray.SetValue(TileMapSprite.Supermarket, i, j);
 
                         }
                         else

@@ -48,6 +48,10 @@ public class CityVisual : MonoBehaviour
                 {
                     gridValueUV = new Vector2(0.25f, 0.25f);
                 }
+                else if (value == Grid.TileMapSprite.Supermarket)
+                {
+                    gridValueUV = new Vector2(0.75f, 0.75f);
+                }
                 else
                 {
                     gridValueUV = Vector2.zero;
