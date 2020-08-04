@@ -10,7 +10,14 @@ public class PlagueSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        
+        Entities.ForEach((ref PlagueComponent pc) =>
+        {
+            if (pc.infectionProb % 2 == 0)
+            {
+
+            }
+
+        }).Schedule();
     }
 }
  
