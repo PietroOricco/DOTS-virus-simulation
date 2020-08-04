@@ -12,11 +12,11 @@ public class HumanSystem : SystemBase
         {
             if(hc.hunger < 100f)
                 hc.hunger += 1f * deltaTime;
-            if (hc.fatigue < 100)
+            if (hc.fatigue < 100f)
                 hc.fatigue += 1f * deltaTime;
-            if (hc.sociality < 100)
+            if (hc.sociality < 100f)
                 hc.sociality += 1f * deltaTime;
-            if (hc.sportivity < 100)
+            if (hc.sportivity < 100f)
                 hc.sportivity += 1f * deltaTime;
         }).Schedule();
     }
