@@ -9,4 +9,5 @@ public struct HumanComponent : IComponentData
     public float sportivity;    //park 
     public float sociality;     //pub
     public float fatigue;       //home
+    // social behavior
 }
