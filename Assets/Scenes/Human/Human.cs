@@ -28,7 +28,7 @@ public class Human : MonoBehaviour
             typeof(MoveSpeedComponent)
         ); 
         
-        entityArray = new NativeArray<Entity>(500000,  Allocator.Temp); 
+        entityArray = new NativeArray<Entity>(10000,  Allocator.Temp); 
         entityManager.CreateEntity(entityArchetype, entityArray);  
 
 
@@ -51,7 +51,7 @@ public class Human : MonoBehaviour
 
             //initial position
             entityManager.SetComponentData(entity, new Translation { 
-                Value = new float3(UnityEngine.Random.Range(0, 1000f), UnityEngine.Random.Range(0, 1000f), 0) 
+                Value = new float3((UnityEngine.Random.Range(0, 100/3))* 30f+10f+UnityEngine.Random.Range(0, 10f), (1 + UnityEngine.Random.Range(0, 100 / 3)) * 30f+10f + UnityEngine.Random.Range(0, 10f), 0) 
             });
 
             //graphics
