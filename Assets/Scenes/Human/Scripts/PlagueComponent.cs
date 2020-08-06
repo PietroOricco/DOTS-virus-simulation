@@ -7,5 +7,6 @@ using Unity.Entities;
 public struct PlagueComponent : IComponentData
 {
     public Boolean infected;
-    public int infectionProb;
+    public float infectionThreshold;
+    public float infectionExposure;
 }

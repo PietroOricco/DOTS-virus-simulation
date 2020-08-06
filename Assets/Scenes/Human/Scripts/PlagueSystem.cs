@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
 using Unity.Rendering;
+using Unity.Transforms;
 using System;
 
 
@@ -10,12 +11,10 @@ public class PlagueSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        Entities.ForEach((ref PlagueComponent pc) =>
+        Entities.ForEach((ref PlagueComponent pc, in Translation t) =>
         {
-            if (pc.infectionProb % 2 == 0)
-            {
 
-            }
+
 
         }).Schedule();
     }
