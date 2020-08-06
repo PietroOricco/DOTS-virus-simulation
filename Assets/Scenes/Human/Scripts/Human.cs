@@ -8,18 +8,21 @@ using Unity.Rendering;
 using System;
 using Unity.Mathematics;
 
-public class Human : MonoBehaviour
-{
+public class Human : MonoBehaviour{
+    public static Human Instance { private set; get; }
     NativeArray<Entity> entityArray;
 
-    [SerializeField] private Mesh mesh;
-    [SerializeField] private Material healthyMaterial;
-    [SerializeField] private Material sickMaterial;
+    [SerializeField] public Mesh mesh;
+    [SerializeField] public Material healthyMaterial;
+    [SerializeField] public Material sickMaterial;
+
+    private void Awake() {
+        Instance = this;
+    }
     private void Start(){
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(HumanComponent),
-            typeof(PlagueComponent),
             typeof(Translation),
             typeof(RenderMesh),
             typeof(LocalToWorld),
@@ -47,7 +50,11 @@ public class Human : MonoBehaviour
             });
 
             //plague component
-            entityManager.SetComponentData(entity, new PlagueComponent { infected = false, infectionExposure=0, infectionThreshold=3 });
+            if(UnityEngine.Random.Range(0, 10f)>7){
+                entityManager.AddComponentData(entity, new InfectionComponent{
+                    infected=true
+                });
+            } 
 
             //speed
             entityManager.SetComponentData(entity, new MoveSpeedComponent { moveSpeedY = UnityEngine.Random.Range(-2f, 2f), moveSpeedX = UnityEngine.Random.Range(-2f, 2f), });
