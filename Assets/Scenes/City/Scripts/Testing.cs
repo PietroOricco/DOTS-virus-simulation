@@ -1,16 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TileMapEnum;
 
-public class Testing : MonoBehaviour
-{
+public class Testing : MonoBehaviour{
+    public static Testing Instance { private set; get; }
+
     [SerializeField] private CityVisual cityVisual;
-    private Grid grid; 
+    public Grid<GridNode> grid; 
+
+    private void Awake() {
+        Instance = this;
+    }
+
     // Start is called before the first frame update
     private void Start()
     {
-        Grid map= new Grid(100, 100, 10f, Vector3.zero);
-
-        cityVisual.SetGrid(map);
+        grid = new Grid<GridNode>(15, 15, 10f, Vector3.zero, (TileMapSprite tileType, Grid<GridNode> grid, int x, int y) => new GridNode(tileType, grid, x, y));
+        cityVisual.SetGrid(grid);
     }
 }

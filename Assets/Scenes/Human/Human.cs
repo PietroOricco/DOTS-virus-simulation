@@ -25,15 +25,18 @@ public class Human : MonoBehaviour
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(RenderBounds),
-            typeof(MoveSpeedComponent)
-        ); 
+            typeof(MoveSpeedComponent),
+            typeof(PathFollow)
+        );
         
-        entityArray = new NativeArray<Entity>(500000,  Allocator.Temp); 
+        entityArray = new NativeArray<Entity>(5,  Allocator.Temp); 
         entityManager.CreateEntity(entityArchetype, entityArray);  
 
 
         for(int i=0; i<entityArray.Length; i++){
             Entity entity = entityArray[i];
+
+            entityManager.AddBuffer<PathPosition>(entity);
 
             //human component
             entityManager.SetComponentData(entity, new HumanComponent{
@@ -51,7 +54,12 @@ public class Human : MonoBehaviour
 
             //initial position
             entityManager.SetComponentData(entity, new Translation { 
-                Value = new float3(UnityEngine.Random.Range(0, 1000f), UnityEngine.Random.Range(0, 1000f), 0) 
+                Value = new float3(UnityEngine.Random.Range(0, 150f), UnityEngine.Random.Range(0, 150f), 0) 
+            });
+
+            //initial position
+            entityManager.SetComponentData(entity, new PathFollow { 
+                pathIndex = -1 
             });
 
             //graphics
@@ -60,6 +68,7 @@ public class Human : MonoBehaviour
                 mesh = mesh,
                 material = healthyMaterial,
             });
+
         }
         entityArray.Dispose();
     }

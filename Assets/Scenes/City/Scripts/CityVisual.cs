@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TileMapEnum;
 
 public class CityVisual : MonoBehaviour
 {
-    private Grid grid;
+    private Grid<GridNode> grid;
     private Mesh mesh;
 
 
@@ -14,7 +15,7 @@ public class CityVisual : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
     }
 
-    public void SetGrid (Grid grid)
+    public void SetGrid (Grid<GridNode> grid)
     {
         this.grid = grid;
         UpdateVisual();
@@ -23,39 +24,32 @@ public class CityVisual : MonoBehaviour
 
     private void UpdateVisual()
     {
-        MeshUtils.CreateEmptyMeshArrays(grid.getWidth() * grid.getHeigth(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
-        for (int i = 0; i<grid.getWidth(); i++)
+        MeshUtils.CreateEmptyMeshArrays(grid.GetWidth() * grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
+        for (int i = 0; i<grid.GetWidth(); i++)
         {
-            for (int j=0; j<grid.getHeigth(); j++)
+            for (int j=0; j<grid.GetHeight(); j++)
             {
-                int index = i * grid.getHeigth() + j;
-                Vector3 quadsize = new Vector3(1, 1) * grid.getCellSize();
-                Grid.TileMapSprite value = grid.getObject(i, j);
+                int index = i * grid.GetHeight() + j;
+                Vector3 quadsize = new Vector3(1, 1) * grid.GetCellSize();
+                TileMapSprite value = grid.GetGridObject(i, j).GetTileType();
                 Vector2 gridValueUV;
-                if (value == Grid.TileMapSprite.Road)
-                {
+                if (value == TileMapSprite.Road){
                     gridValueUV = Vector2.zero;
                 }
-                else if (value == Grid.TileMapSprite.Park)
-                {
+                else if (value == TileMapSprite.Park){
                     gridValueUV = Vector2.one;
                 }
-                else if (value == Grid.TileMapSprite.Home)
-                {
+                else if (value == TileMapSprite.Home){
                     gridValueUV = new Vector2(0.5f,0.5f);
                 }
-                else if (value == Grid .TileMapSprite.Pub)
-                {
+                else if (value == TileMapSprite.Pub){
                     gridValueUV = new Vector2(0.25f, 0.25f);
                 }
-                else if (value == Grid.TileMapSprite.Supermarket)
-                {
+                else if (value == TileMapSprite.Supermarket){
                     gridValueUV = new Vector2(0.75f, 0.75f);
                 }
-                else
-                {
+                else{
                     gridValueUV = Vector2.zero;
-
                 }
                 MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(i,j)+quadsize*0.5f, 0f, quadsize, gridValueUV, gridValueUV);
 

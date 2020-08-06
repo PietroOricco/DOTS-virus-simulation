@@ -6,6 +6,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using System;
 
+/*
 public class MoverSystem : SystemBase
 {
     protected override void OnUpdate() {
@@ -15,7 +16,7 @@ public class MoverSystem : SystemBase
             t.Value.x += ms.moveSpeedX * deltaTime;
             t.Value.y += ms.moveSpeedY * deltaTime;
 
-            if (t.Value.y > 1000f) {
+            if (t.Value.y > 150f) {
                 ms.moveSpeedY = -Math.Abs(ms.moveSpeedY);
             }
             if (t.Value.y < 0)
@@ -23,7 +24,7 @@ public class MoverSystem : SystemBase
                 ms.moveSpeedY = +Math.Abs(ms.moveSpeedY);
             }
 
-            if (t.Value.x > 1000f)
+            if (t.Value.x > 150f)
             {
                 ms.moveSpeedX = -Math.Abs(ms.moveSpeedX);
             }
@@ -34,3 +35,4 @@ public class MoverSystem : SystemBase
         }).Schedule();
     }
 }
+*/
