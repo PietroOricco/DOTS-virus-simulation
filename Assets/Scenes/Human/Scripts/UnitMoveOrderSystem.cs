@@ -7,15 +7,13 @@ public class UnitMoveOrderSystem : SystemBase {
 
     protected override void OnUpdate() {
         if (Input.GetMouseButtonDown(0)) {
-	        Vector3 mousePosition = new Vector3(0,0,0);
+	        Vector3 worldPosition = new Vector3(11,11,0);
 
 	        float cellSize = Testing.Instance.grid.GetCellSize();
 
-	        Testing.Instance.grid.GetXY(mousePosition + new Vector3(1, 1) * cellSize * +.5f, out int endX, out int endY);
+	        Testing.Instance.grid.GetXY(worldPosition + new Vector3(1, 1) * cellSize * +.5f, out int endX, out int endY);
 	
 	        ValidateGridPosition(ref endX, ref endY);
-			endX = 1;
-			endY = 1;
 
 			EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 

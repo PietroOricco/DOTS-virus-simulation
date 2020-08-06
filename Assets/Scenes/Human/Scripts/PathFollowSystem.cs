@@ -15,12 +15,14 @@ public class PathFollowSystem : JobComponentSystem {
     protected override JobHandle OnUpdate(JobHandle inputDeps) {
         float deltaTime = Time.DeltaTime;
 
+        float cellSize = Testing.Instance.grid.GetCellSize();
+
         return Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, ref PathFollow pathFollow) => {
             if (pathFollow.pathIndex >= 0) {
                 // Has path to follow
                 PathPosition pathPosition = pathPositionBuffer[pathFollow.pathIndex];
 
-                float3 targetPosition = new float3(pathPosition.position.x, pathPosition.position.y, 0);
+                float3 targetPosition = new float3(pathPosition.position.x*cellSize+cellSize*0.5f, pathPosition.position.y*cellSize+cellSize*0.5f, 0);
                 float3 moveDir = math.normalizesafe(targetPosition - translation.Value);
                 float moveSpeed = 3f;
 
@@ -42,7 +44,6 @@ public class PathFollowSystem : JobComponentSystem {
 }
 
 [UpdateAfter(typeof(PathFollowSystem))]
-[DisableAutoCreation]
 public class PathFollowGetNewPathSystem : JobComponentSystem {
     
     private Unity.Mathematics.Random random;
@@ -66,6 +67,8 @@ public class PathFollowGetNewPathSystem : JobComponentSystem {
 
         JobHandle jobHandle = Entities.WithNone<PathfindingParams>().ForEach((Entity entity, int entityInQueryIndex, in PathFollow pathFollow, in Translation translation) => { 
             if (pathFollow.pathIndex == -1) {
+
+                Debug.Log("Get new path");
                 
                 GetXY(translation.Value + new float3(1, 1, 0) * cellSize * +.5f, originPosition, cellSize, out int startX, out int startY);
 

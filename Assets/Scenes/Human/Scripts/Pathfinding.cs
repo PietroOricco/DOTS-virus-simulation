@@ -123,7 +123,7 @@ public class Pathfinding : ComponentSystem {
                 // Found a path
                 CalculatePath(pathNodeArray, endNode, pathPositionBuffer);
                 
-                pathFollowComponentDataFromEntity[entity] = new PathFollow { pathIndex = pathPositionBuffer.Length - 1 };
+                pathFollowComponentDataFromEntity[entity] = new PathFollow { pathIndex = pathPositionBuffer.Length - 2 };
             }
 
         }
@@ -199,7 +199,7 @@ public class Pathfinding : ComponentSystem {
 
                     if (!IsPositionInsideGrid(neighbourPosition, gridSize)) {
                         // Neighbour not valid position
-                        Debug.Log("Neighbour not valid position!");
+                        //Debug.Log("Neighbour not valid position!");
                         continue;
                     }
 
@@ -207,7 +207,7 @@ public class Pathfinding : ComponentSystem {
 
                     if (closedList.Contains(neighbourNodeIndex)) {
                         // Already searched this node
-                        Debug.Log("Already searched this node!");
+                        //Debug.Log("Already searched this node!");
                         continue;
                     }
 
