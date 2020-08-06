@@ -29,6 +29,16 @@ public class PlagueSystem : SystemBase{
             });
         }).Schedule();
 
+        Entities.WithNone<InfectionComponent>().WithSharedComponentFilter(new RenderMesh{
+            mesh = Human.Instance.mesh,
+            material = Human.Instance.sickMaterial
+        }).ForEach((Entity entity)=>{
+            // https://forum.unity.com/threads/burst-error-adding-component-frozenrenderscenetag.810753/
+            ecb.SetSharedComponent<RenderMesh>(entity, new RenderMesh{
+                mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
+            });
+        }).Schedule();
+
         ecbSystem.AddJobHandleForProducer(Dependency);
     }
 }
