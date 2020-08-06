@@ -31,7 +31,7 @@ public class Human : MonoBehaviour{
             typeof(PathFollow)
         );
 
-        entityArray = new NativeArray<Entity>(100, Allocator.Temp);
+        entityArray = new NativeArray<Entity>(10000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
@@ -61,7 +61,7 @@ public class Human : MonoBehaviour{
 
             //initial position
             entityManager.SetComponentData(entity, new Translation{
-                Value = new float3((UnityEngine.Random.Range(0, 15 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 15 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
+                Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
             });
 
             //initial position
@@ -78,42 +78,5 @@ public class Human : MonoBehaviour{
         }
 
         entityArray.Dispose();
-        entityArchetype = entityManager.CreateArchetype(
-            typeof(HumanComponent),
-            typeof(InfectionComponent),
-            typeof(Translation),
-            typeof(RenderMesh),
-            typeof(LocalToWorld),
-            typeof(RenderBounds),
-            typeof(MoveSpeedComponent)
-        );
-        Entity entitySick = entityManager.CreateEntity(entityArchetype);
-        entityManager.SetComponentData(entitySick, new HumanComponent
-        {
-            hunger = 50,
-            sportivity = 50,
-            sociality = 50,
-            fatigue = 50
-        });
-
-        //Infection component
-        entityManager.SetComponentData(entitySick, new InfectionComponent { infected = true });
-
-        //speed
-        entityManager.SetComponentData(entitySick, new MoveSpeedComponent { moveSpeedY = UnityEngine.Random.Range(-2f, 2f), moveSpeedX = UnityEngine.Random.Range(-2f, 2f), });
-
-        //initial position
-        entityManager.SetComponentData(entitySick, new Translation
-        {
-            Value = new float3((UnityEngine.Random.Range(0, 100 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (1 + UnityEngine.Random.Range(0, 100 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
-        });
-
-        //graphics
-        entityManager.SetSharedComponentData(entitySick, new RenderMesh
-        {
-            mesh = mesh,
-            material = sickMaterial,
-        });
     }
-
 }

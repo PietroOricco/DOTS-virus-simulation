@@ -16,7 +16,7 @@ public class Testing : MonoBehaviour{
     // Start is called before the first frame update
     private void Start()
     {
-        grid = new Grid<GridNode>(15, 15, 10f, Vector3.zero, (TileMapSprite tileType, Grid<GridNode> grid, int x, int y) => new GridNode(tileType, grid, x, y));
+        grid = new Grid<GridNode>(45, 45, 10f, Vector3.zero, (TileMapSprite tileType, Grid<GridNode> grid, int x, int y) => new GridNode(tileType, grid, x, y));
         cityVisual.SetGrid(grid);
     }
 }
