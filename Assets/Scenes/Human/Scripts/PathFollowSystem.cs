@@ -24,7 +24,7 @@ public class PathFollowSystem : JobComponentSystem {
 
                 float3 targetPosition = new float3(pathPosition.position.x*cellSize+cellSize*0.5f, pathPosition.position.y*cellSize+cellSize*0.5f, 0);
                 float3 moveDir = math.normalizesafe(targetPosition - translation.Value);
-                float moveSpeed = 3f;
+                float moveSpeed = 5f;
 
                 translation.Value += moveDir * moveSpeed * deltaTime;
                 
@@ -70,7 +70,7 @@ public class PathFollowGetNewPathSystem : JobComponentSystem {
 
                 Debug.Log("Get new path");
                 
-                GetXY(translation.Value + new float3(1, 1, 0) * cellSize * +.5f, originPosition, cellSize, out int startX, out int startY);
+                GetXY(translation.Value, originPosition, cellSize, out int startX, out int startY);
 
                 ValidateGridPosition(ref startX, ref startY, mapWidth, mapHeight);
 

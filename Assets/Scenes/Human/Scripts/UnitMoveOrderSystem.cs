@@ -18,7 +18,7 @@ public class UnitMoveOrderSystem : SystemBase {
 			EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
 	        Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation) => {
-		        Testing.Instance.grid.GetXY(translation.Value + new float3(1, 1, 0) * cellSize * +.5f, out int startX, out int startY);
+		        Testing.Instance.grid.GetXY(translation.Value, out int startX, out int startY);
 
 		        ValidateGridPosition(ref startX, ref startY);
 

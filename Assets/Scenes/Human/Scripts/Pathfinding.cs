@@ -212,9 +212,11 @@ public class Pathfinding : ComponentSystem {
                     }
 
                     PathNode neighbourNode = pathNodeArray[neighbourNodeIndex];
-                    if (!neighbourNode.isWalkable) {
+                    if ((!neighbourNode.isWalkable)&&
+                        (neighbourNode.x!=endPosition.x||neighbourNode.y!=endPosition.y)&&
+                        (neighbourNode.x!=startPosition.x||neighbourNode.y!=startPosition.y)) {
                         // Not walkable
-                        Debug.Log("Not walkable!");
+                        //Debug.Log("Not walkable!");
                         continue;
                     }
 
