@@ -18,6 +18,26 @@ public class HumanSystem : SystemBase
                 hc.sociality += 1f * deltaTime;
             if (hc.sportivity < 100f)
                 hc.sportivity += 1f * deltaTime;
+
+            if (hc.hunger > 75 && hc.status == HumanComponent.need.none)
+            {
+                hc.status = HumanComponent.need.needForFood;
+            }
+            else if (hc.fatigue > 75 && hc.status == HumanComponent.need.none) 
+            {
+                hc.status = HumanComponent.need.needToRest;
+            }
+            else if (hc.sportivity > 75 && hc.status == HumanComponent.need.none)
+            {
+                hc.status = HumanComponent.need.needForSport;
+            }
+            else if (hc.sociality > 75 && hc.status == HumanComponent.need.none)
+            {
+                hc.status = HumanComponent.need.needForSociality;
+            }
+
+
+
         }).Schedule();
     }
 }

@@ -7,7 +7,7 @@ public class Testing : MonoBehaviour{
     public static Testing Instance { private set; get; }
 
     [SerializeField] private CityVisual cityVisual;
-    public Grid<GridNode> grid; 
+    public Grid<GridNode> grid;
 
     private void Awake() {
         Instance = this;

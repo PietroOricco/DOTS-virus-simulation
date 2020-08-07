@@ -31,7 +31,7 @@ public class Human : MonoBehaviour{
             typeof(PathFollow)
         );
 
-        entityArray = new NativeArray<Entity>(10000, Allocator.Temp);
+        entityArray = new NativeArray<Entity>(10, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
@@ -43,11 +43,12 @@ public class Human : MonoBehaviour{
             //human component
             entityManager.SetComponentData(entity, new HumanComponent
             {
-                hunger = 50,
-                sportivity = 50,
-                sociality = 50,
-                fatigue = 50
-            });
+                status = HumanComponent.need.none,
+                hunger = UnityEngine.Random.Range(0, 100),
+                sportivity = UnityEngine.Random.Range(0, 100),
+                sociality = UnityEngine.Random.Range(0, 100),
+                fatigue = UnityEngine.Random.Range(0, 100)
+            }); ;
 
             //plague component
             if(UnityEngine.Random.Range(0, 10f)>7){
