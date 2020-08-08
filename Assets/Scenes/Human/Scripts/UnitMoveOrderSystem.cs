@@ -35,8 +35,7 @@ public class UnitMoveOrderSystem : SystemBase {
 			    startPosition = new int2(startX, startY), 
                 endPosition = new int2(endX, endY) 
 		    });
-	    }).WithStructuralChanges().Run();
-        
+	    }).WithStructuralChanges().Run(); 
     }
 
     private void ValidateGridPosition(ref int x, ref int y) {
