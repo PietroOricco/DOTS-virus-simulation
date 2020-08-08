@@ -15,24 +15,29 @@ public class UnitMoveOrderSystem : SystemBase {
 
 		EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-	    Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, in HumanComponent hc) => {
-		    Testing.Instance.grid.GetXY(translation.Value, out int startX, out int startY);
+	    Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, ref HumanComponent hc) => {
+            if (!hc.goingToNeedPlace)
+            {
+                Testing.Instance.grid.GetXY(translation.Value, out int startX, out int startY);
 
-		    ValidateGridPosition(ref startX, ref startY);
+                ValidateGridPosition(ref startX, ref startY);
 
-			range = 2;
-			FindTarget(startX, startY, ref endX, ref endY, hc.status, range);
-			while (endX == -1 && endY == -1)
-			{
-				range *= 2;
-				FindTarget(startX, startY, ref endX, ref endY, hc.status, range);
-			}
+                range = 2;
+                FindTarget(startX, startY, ref endX, ref endY, hc.status, range);
+                while (endX == -1 && endY == -1)
+                {
+                    range *= 2;
+                    FindTarget(startX, startY, ref endX, ref endY, hc.status, range);
+                }
 
 
-			entityManager.AddComponentData(entity, new PathfindingParams { 
-			    startPosition = new int2(startX, startY), 
-                endPosition = new int2(endX, endY) 
-		    });
+                entityManager.AddComponentData(entity, new PathfindingParams
+                {
+                    startPosition = new int2(startX, startY),
+                    endPosition = new int2(endX, endY)
+                });
+                hc.goingToNeedPlace = true;
+            }
 	    }).WithStructuralChanges().Run();
         
     }
@@ -59,7 +64,6 @@ public class UnitMoveOrderSystem : SystemBase {
 						{
 							endX = i;
 							endY = j;
-							Debug.Log("Supermarket: " + i + " " + j);
 							return;
 						}
 				}
@@ -77,7 +81,6 @@ public class UnitMoveOrderSystem : SystemBase {
 						{
 							endX = i;
 							endY = j;
-							Debug.Log("Park: " + i + " " + j);
 							return;
 						}
 				}
@@ -95,7 +98,6 @@ public class UnitMoveOrderSystem : SystemBase {
 						{
 							endX = i;
 							endY = j;
-							Debug.Log("Pub: " + i + " " + j);
 							return;
 						}
 				}
@@ -113,7 +115,6 @@ public class UnitMoveOrderSystem : SystemBase {
 						{
 							endX = i;
 							endY = j;
-							Debug.Log("Home: " + i + " " + j);
 							return;
 						}
 				}

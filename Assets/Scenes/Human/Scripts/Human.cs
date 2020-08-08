@@ -31,7 +31,7 @@ public class Human : MonoBehaviour{
             typeof(PathFollow)
         );
 
-        entityArray = new NativeArray<Entity>(10, Allocator.Temp);
+        entityArray = new NativeArray<Entity>(1, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
@@ -43,6 +43,7 @@ public class Human : MonoBehaviour{
             //human component
             entityManager.SetComponentData(entity, new HumanComponent
             {
+                goingToNeedPlace = false,
                 status = HumanComponent.need.none,
                 hunger = UnityEngine.Random.Range(0, 100),
                 sportivity = UnityEngine.Random.Range(0, 100),
