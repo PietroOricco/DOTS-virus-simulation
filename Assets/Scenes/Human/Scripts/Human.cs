@@ -45,10 +45,10 @@ public class Human : MonoBehaviour{
             {
                 goingToNeedPlace = false,
                 status = HumanComponent.need.none,
-                hunger = UnityEngine.Random.Range(0, 100),
-                sportivity = UnityEngine.Random.Range(0, 100),
-                sociality = UnityEngine.Random.Range(0, 100),
-                fatigue = UnityEngine.Random.Range(0, 100)
+                hunger = UnityEngine.Random.Range(0, 100f),
+                sportivity = UnityEngine.Random.Range(0, 100f),
+                sociality = UnityEngine.Random.Range(0, 100f),
+                fatigue = UnityEngine.Random.Range(0, 100f)
             }); ;
 
             //plague component
