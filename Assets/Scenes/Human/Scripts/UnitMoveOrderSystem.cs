@@ -23,8 +23,6 @@ public class UnitMoveOrderSystem : SystemBase {
 		var height = Testing.Instance.grid.GetHeight();
 		var grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
 
-
-		EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 	    Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, ref HumanComponent hc) => {
             if (!hc.goingToNeedPlace){
 				int range = 2;
