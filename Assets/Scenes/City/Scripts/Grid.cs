@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TileMapEnum;
+using Unity.Collections;
 
 public class Grid<TGridObject> {
 
@@ -139,5 +140,15 @@ public class Grid<TGridObject> {
         GetXY(worldPosition, out x, out y);
         return GetGridObject(x, y);
     }
+
+    public NativeArray<TileMapSprite> GetGridByValue(Func<TGridObject, TileMapSprite> convert){
+        NativeArray<TileMapSprite> grid = new NativeArray<TileMapSprite>(GetWidth()*GetHeight(), Allocator.Temp);
+        for(int i = 0; i < GetWidth(); i++){
+            for(int j = 0; j < GetHeight(); j++){
+                grid[i+j*GetWidth()] = convert(gridArray[i,j]);
+            }
+        }
+        return grid;
+    } 
 
 }
