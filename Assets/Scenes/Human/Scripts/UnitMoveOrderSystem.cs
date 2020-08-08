@@ -9,88 +9,137 @@ using Unity.Collections;
 
 public class UnitMoveOrderSystem : SystemBase {
 
-	protected override void OnUpdate() {
-		int range;
-		int endX, endY;
+	private EndSimulationEntityCommandBufferSystem ecbSystem;
+ 
+    protected override void OnCreate(){
+        ecbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+    }
 
-		endX = endY = -1;
+	protected override void OnUpdate() {
+		var ecb = ecbSystem.CreateCommandBuffer();
+
+		var cellSize = Testing.Instance.grid.GetCellSize();
+        var width = Testing.Instance.grid.GetWidth();
+		var height = Testing.Instance.grid.GetHeight();
+		var grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+
 
 		EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
 	    Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, ref HumanComponent hc) => {
-            if (!hc.goingToNeedPlace)
-            {
-                Testing.Instance.grid.GetXY(translation.Value, out int startX, out int startY);
+            if (!hc.goingToNeedPlace){
+				int range = 2;
 
-                ValidateGridPosition(ref startX, ref startY);
+                GetXY(translation.Value, Vector3.zero, cellSize, out int startX, out int startY);
 
-                range = 2;
-                FindTarget(startX, startY, ref endX, ref endY, hc.status, range);
-                while (endX == -1 && endY == -1)
+				//FIXME validation removed!
+
+                //int pos = FindTarget(startX, startY, hc.status, range, grid, width, height);
+
+				int i, j, endX = -1, endY = -1;
+				bool found = false;
+
+				NativeArray<TileMapEnum.TileMapSprite> result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
+				switch(hc.status){
+					case HumanComponent.need.needForFood:
+						result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
+						result[0]=TileMapEnum.TileMapSprite.Supermarket;
+						result[1]=TileMapEnum.TileMapSprite.Pub;
+						break;
+					case HumanComponent.need.needForSociality:
+						result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
+						result[0]=TileMapEnum.TileMapSprite.Park;
+						result[1]=TileMapEnum.TileMapSprite.Pub;
+						break;
+					case HumanComponent.need.needForSport:
+						result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+						result[0]=TileMapEnum.TileMapSprite.Park;
+						break;
+					case HumanComponent.need.needToRest:
+						result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+						result[0]=TileMapEnum.TileMapSprite.Home;
+						break;	
+				}
+
+				for (i = startX - range; i < startX + range && !found ; i++) {
+					for (j = startY - range; j < startY + range && !found; j++) {
+						if (i >= 0 && j >= 0 && i < width && j < height )
+							if (ArrayUtility.Contains(result.ToArray(), grid[i+j*width])){
+								endX = i;
+								endY = j;
+								found = true;
+							}
+					}
+				}
+
+                while (!found)
                 {
                     range *= 2;
-                    FindTarget(startX, startY, ref endX, ref endY, hc.status, range);
+                    //pos = FindTarget(startX, startY, hc.status, range, grid, width, height);
+					for (i = startX - range; i < startX + range && !found ; i++) {
+						for (j = startY - range; j < startY + range && !found; j++) {
+							if (i >= 0 && j >= 0 && i < width && j < height )
+								if (ArrayUtility.Contains(result.ToArray(), grid[i+j*width])){
+									endX = i;
+									endY = j;
+									found = true;
+								}
+						}
+					}
                 }
 
-
-                entityManager.AddComponentData(entity, new PathfindingParams
+				ecb.SetComponent(entity, new PathfindingParams
                 {
                     startPosition = new int2(startX, startY),
                     endPosition = new int2(endX, endY)
                 });
                 hc.goingToNeedPlace = true;
             }
-	    }).WithStructuralChanges().Run();
-        
+	    }).ScheduleParallel();
     }
 
-    private void ValidateGridPosition(ref int x, ref int y) {
-        x = math.clamp(x, 0, Testing.Instance.grid.GetWidth() - 1);
-        y = math.clamp(y, 0, Testing.Instance.grid.GetHeight() - 1);
-    }
-
-	private TileMapEnum.TileMapSprite[] GetPlacesForStatus(HumanComponent.need status){
+	private NativeArray<TileMapEnum.TileMapSprite> GetPlacesForStatus(HumanComponent.need status){
+		NativeArray<TileMapEnum.TileMapSprite> result;
 		switch(status){
 			case HumanComponent.need.needForFood:
-				return new TileMapEnum.TileMapSprite[]{
-					TileMapEnum.TileMapSprite.Supermarket,
-					TileMapEnum.TileMapSprite.Pub
-				};
+				result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
+				result[0]=TileMapEnum.TileMapSprite.Supermarket;
+				result[1]=TileMapEnum.TileMapSprite.Pub;
+				return result;
 			case HumanComponent.need.needForSociality:
-				return new TileMapEnum.TileMapSprite[]{
-					TileMapEnum.TileMapSprite.Pub,
-					TileMapEnum.TileMapSprite.Park
-				};
+				result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
+				result[0]=TileMapEnum.TileMapSprite.Park;
+				result[1]=TileMapEnum.TileMapSprite.Pub;
+				return result;
 			case HumanComponent.need.needForSport:
-				return new TileMapEnum.TileMapSprite[]{
-					TileMapEnum.TileMapSprite.Park,
-				};
+				result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+				result[0]=TileMapEnum.TileMapSprite.Park;
+				return result;
 			case HumanComponent.need.needToRest:
-				return new TileMapEnum.TileMapSprite[]{
-					TileMapEnum.TileMapSprite.Home
-				};
+				result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+				result[0]=TileMapEnum.TileMapSprite.Home;
+				return result;
 			default:
-				return new TileMapEnum.TileMapSprite[]{};
+				return new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
 		}
 	}
 
 
-	private void FindTarget(int startX, int startY, ref int endX, ref int endY, HumanComponent.need status, int range) {
+	private int FindTarget(int startX, int startY, HumanComponent.need status, int range, NativeArray<TileMapEnum.TileMapSprite> grid, int width, int height) {
 		int i, j;
-
-		endY = endX = -1;
-
 
 		for (i = startX - range; i < startX + range; i++) {
 			for (j = startY - range; j < startY + range; j++) {
-				if (i >= 0 && j >= 0 && i < Testing.Instance.grid.GetWidth() && j < Testing.Instance.grid.GetHeight() )
-					if (ArrayUtility.Contains(GetPlacesForStatus(status), Testing.Instance.grid.GetGridObject(i, j).GetTileType())){
-						endX = i;
-						endY = j;
-						return;
-					}
+				if (i >= 0 && j >= 0 && i < width && j < height )
+					//if (ArrayUtility.Contains(GetPlacesForStatus(status), grid[i+j*width])){
+						return i+j*width;
+					//}
 			}
 		}
-		return;
+		return -1;
 	}
+
+	private static void GetXY(float3 worldPosition, float3 originPosition, float cellSize, out int x, out int y) {
+        x = (int)math.floor((worldPosition - originPosition).x / cellSize);
+        y = (int)math.floor((worldPosition - originPosition).y / cellSize);
+    }
 }
