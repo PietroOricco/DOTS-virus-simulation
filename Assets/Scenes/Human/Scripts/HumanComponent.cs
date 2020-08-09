@@ -14,7 +14,6 @@ public struct HumanComponent : IComponentData
         none
     }
     // human needs
-    public bool goingToNeedPlace;
     public need status;
     public float hunger;        //supermarket
     public float sportivity;    //park 

@@ -17,14 +17,14 @@ public class PlagueSystem : SystemBase{
     }
 
     protected override void OnUpdate(){
-        var ecb = ecbSystem.CreateCommandBuffer();
+        var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
         Entities.WithSharedComponentFilter(new RenderMesh{
             mesh = Human.Instance.mesh,
             material = Human.Instance.healthyMaterial
-        }).ForEach((Entity entity, InfectionComponent ic)=>{
+        }).ForEach((Entity entity, int nativeThreadIndex, InfectionComponent ic)=>{
             // https://forum.unity.com/threads/burst-error-adding-component-frozenrenderscenetag.810753/
-            ecb.SetSharedComponent<RenderMesh>(entity, new RenderMesh{
+            ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
                 mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
             });
         }).Schedule();
@@ -32,9 +32,9 @@ public class PlagueSystem : SystemBase{
         Entities.WithNone<InfectionComponent>().WithSharedComponentFilter(new RenderMesh{
             mesh = Human.Instance.mesh,
             material = Human.Instance.sickMaterial
-        }).ForEach((Entity entity)=>{
+        }).ForEach((Entity entity, int nativeThreadIndex) =>{
             // https://forum.unity.com/threads/burst-error-adding-component-frozenrenderscenetag.810753/
-            ecb.SetSharedComponent<RenderMesh>(entity, new RenderMesh{
+            ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
                 mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
             });
         }).Schedule();

@@ -4,6 +4,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using System;
 using UnityEditor;
+using Unity.Jobs;
 using Unity.Collections;
 
 
@@ -16,16 +17,16 @@ public class UnitMoveOrderSystem : SystemBase {
     }
 
 	protected override void OnUpdate() {
-		var ecb = ecbSystem.CreateCommandBuffer();
+		var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
 		var cellSize = Testing.Instance.grid.GetCellSize();
         var width = Testing.Instance.grid.GetWidth();
 		var height = Testing.Instance.grid.GetHeight();
 		var grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
-
-	    Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, ref HumanComponent hc) => {
-            if (!hc.goingToNeedPlace){
+        JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, DynamicBuffer <PathPosition> pathPositionBuffer, ref PathFollow pathFollow, ref Translation translation, ref HumanComponent hc) => {
+            if (pathFollow.pathIndex==-1){
 				int range = 2;
+
 
                 GetXY(translation.Value, Vector3.zero, cellSize, out int startX, out int startY);
 
@@ -58,7 +59,15 @@ public class UnitMoveOrderSystem : SystemBase {
 						break;	
 				}
 
-				for (i = startX - range; i < startX + range && !found ; i++) {
+
+                if (ArrayUtility.Contains(result.ToArray(), grid[startX + startY * width]))
+                {
+                    endX = startX;
+                    endY = startY;
+                    found = true;
+                }
+
+                for (i = startX - range; i < startX + range && !found ; i++) {
 					for (j = startY - range; j < startY + range && !found; j++) {
 						if (i >= 0 && j >= 0 && i < width && j < height )
 							if (ArrayUtility.Contains(result.ToArray(), grid[i+j*width])){
@@ -85,14 +94,17 @@ public class UnitMoveOrderSystem : SystemBase {
 					}
                 }
 
-				ecb.SetComponent(entity, new PathfindingParams
+
+				ecb.AddComponent<PathfindingParams>(nativeThreadIndex , entity, new PathfindingParams
                 {
                     startPosition = new int2(startX, startY),
                     endPosition = new int2(endX, endY)
                 });
-                hc.goingToNeedPlace = true;
-            }
-	    }).ScheduleParallel();
+                }
+	    }).Schedule(this.Dependency);
+
+        jobHandle.Complete();
+        grid.Dispose();
     }
 
 	private NativeArray<TileMapEnum.TileMapSprite> GetPlacesForStatus(HumanComponent.need status){

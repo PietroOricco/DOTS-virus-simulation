@@ -6,16 +6,17 @@ using Unity.Entities;
 using Unity.Jobs;
 using System;
 using Unity.Mathematics;
+using Unity.Collections;
 
 public class HumanSystem : SystemBase
 {
     protected override void OnUpdate(){
         float deltaTime = Time.DeltaTime;
-        var grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
-        var cellSize = Testing.Instance.grid.GetCellSize();
-        var width = Testing.Instance.grid.GetWidth();
+        NativeArray<TileMapEnum.TileMapSprite> grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+        float cellSize = Testing.Instance.grid.GetCellSize();
+        int width = Testing.Instance.grid.GetWidth();
 
-        Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
+        JobHandle jobhandle = Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
             if(hc.hunger < 100f)
                 hc.hunger += 1f * deltaTime;
             if (hc.fatigue < 100f)
@@ -64,7 +65,21 @@ public class HumanSystem : SystemBase
                 hc.status = HumanComponent.need.needForSociality;
             }
 
-        }).ScheduleParallel();
+            if (hc.status!= HumanComponent.need.none)
+            {
+                if (hc.status == HumanComponent.need.needForFood && hc.hunger < 25f)
+                    hc.status = HumanComponent.need.none;
+                else if (hc.status == HumanComponent.need.needToRest && hc.fatigue < 25f)
+                    hc.status = HumanComponent.need.none;
+                else if (hc.status == HumanComponent.need.needForSport && hc.sportivity < 25f)
+                    hc.status = HumanComponent.need.none;
+                else if (hc.status == HumanComponent.need.needForSociality && hc.sociality < 25f)
+                    hc.status = HumanComponent.need.none;
+            }
+
+        }).ScheduleParallel(this.Dependency);
+        jobhandle.Complete();
+        grid.Dispose();
     }
 
     private static void GetXY(float3 worldPosition, float3 originPosition, float cellSize, out int x, out int y) {

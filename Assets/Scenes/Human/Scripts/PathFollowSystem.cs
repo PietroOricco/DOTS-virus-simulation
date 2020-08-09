@@ -43,7 +43,7 @@ public class PathFollowSystem : JobComponentSystem {
 
 }
 
-[UpdateAfter(typeof(PathFollowSystem))]
+/*[UpdateAfter(typeof(PathFollowSystem))]
 public class PathFollowGetNewPathSystem : JobComponentSystem {
     
     private Unity.Mathematics.Random random;
@@ -99,3 +99,4 @@ public class PathFollowGetNewPathSystem : JobComponentSystem {
     }
 
 }
+*/
