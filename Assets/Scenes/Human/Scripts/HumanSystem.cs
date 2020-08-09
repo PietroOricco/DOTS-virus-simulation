@@ -77,7 +77,7 @@ public class HumanSystem : SystemBase
                     hc.status = HumanComponent.need.none;
             }
 
-        }).ScheduleParallel(this.Dependency);
+        }).ScheduleParallel(Dependency);
         jobhandle.Complete();
         grid.Dispose();
     }

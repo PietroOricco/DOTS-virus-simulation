@@ -8,6 +8,7 @@ using Unity.Jobs;
 using Unity.Collections;
 
 
+[UpdateAfter(typeof(PathFollowSystem))]
 public class UnitMoveOrderSystem : SystemBase {
 
 	private EndSimulationEntityCommandBufferSystem ecbSystem;
@@ -24,9 +25,8 @@ public class UnitMoveOrderSystem : SystemBase {
 		var height = Testing.Instance.grid.GetHeight();
 		var grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
         JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, DynamicBuffer <PathPosition> pathPositionBuffer, ref PathFollow pathFollow, ref Translation translation, ref HumanComponent hc) => {
-            if (pathFollow.pathIndex==-1){
+            if(pathFollow.pathIndex==-1){
 				int range = 2;
-
 
                 GetXY(translation.Value, Vector3.zero, cellSize, out int startX, out int startY);
 
@@ -60,8 +60,7 @@ public class UnitMoveOrderSystem : SystemBase {
 				}
 
 
-                if (ArrayUtility.Contains(result.ToArray(), grid[startX + startY * width]))
-                {
+                if (ArrayUtility.Contains(result.ToArray(), grid[startX + startY * width])){
                     endX = startX;
                     endY = startY;
                     found = true;
@@ -78,8 +77,7 @@ public class UnitMoveOrderSystem : SystemBase {
 					}
 				}
 
-                while (!found)
-                {
+                for(int tmax = 0; tmax < 5 && !found; tmax++){
                     range *= 2;
                     //pos = FindTarget(startX, startY, hc.status, range, grid, width, height);
 					for (i = startX - range; i < startX + range && !found ; i++) {
@@ -95,13 +93,12 @@ public class UnitMoveOrderSystem : SystemBase {
                 }
 
 
-				ecb.AddComponent<PathfindingParams>(nativeThreadIndex , entity, new PathfindingParams
-                {
+				ecb.AddComponent<PathfindingParams>(nativeThreadIndex , entity, new PathfindingParams{
                     startPosition = new int2(startX, startY),
                     endPosition = new int2(endX, endY)
                 });
-                }
-	    }).Schedule(this.Dependency);
+            }
+	    }).Schedule(Dependency);
 
         jobHandle.Complete();
         grid.Dispose();

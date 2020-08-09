@@ -24,11 +24,11 @@ public class PathFollowSystem : JobComponentSystem {
 
                 float3 targetPosition = new float3(pathPosition.position.x*cellSize+cellSize*0.5f, pathPosition.position.y*cellSize+cellSize*0.5f, 0);
                 float3 moveDir = math.normalizesafe(targetPosition - translation.Value);
-                float moveSpeed = 5f;
+                float moveSpeed = 10f;
 
                 translation.Value += moveDir * moveSpeed * deltaTime;
                 
-                if (math.distance(translation.Value, targetPosition) < .1f) {
+                if (math.distance(translation.Value, targetPosition) < cellSize*.25f) {
                     // Next waypoint
                     pathFollow.pathIndex--;
                 }
@@ -43,7 +43,8 @@ public class PathFollowSystem : JobComponentSystem {
 
 }
 
-/*[UpdateAfter(typeof(PathFollowSystem))]
+/*
+[UpdateAfter(typeof(PathFollowSystem))]
 public class PathFollowGetNewPathSystem : JobComponentSystem {
     
     private Unity.Mathematics.Random random;
@@ -74,8 +75,8 @@ public class PathFollowGetNewPathSystem : JobComponentSystem {
 
                 ValidateGridPosition(ref startX, ref startY, mapWidth, mapHeight);
 
-                int endX = random.NextInt(0, mapWidth);
-                int endY = random.NextInt(0, mapHeight);
+                int endX = 0;//random.NextInt(0, mapWidth);
+                int endY = 2;//random.NextInt(0, mapHeight);
 
                 entityCommandBuffer.AddComponent(entityInQueryIndex, entity, new PathfindingParams { 
                     startPosition = new int2(startX, startY), endPosition = new int2(endX, endY) 
