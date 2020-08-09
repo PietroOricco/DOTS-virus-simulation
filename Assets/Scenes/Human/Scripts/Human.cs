@@ -65,7 +65,6 @@ public class Human : MonoBehaviour{
                 Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
             });
 
-            //initial position
             entityManager.SetComponentData(entity, new PathFollow { 
                 pathIndex = -1 
             });
