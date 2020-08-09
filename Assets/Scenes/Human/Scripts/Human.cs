@@ -31,7 +31,7 @@ public class Human : MonoBehaviour{
             typeof(PathFollow)
         );
 
-        entityArray = new NativeArray<Entity>(10, Allocator.Temp);
+        entityArray = new NativeArray<Entity>(100, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
