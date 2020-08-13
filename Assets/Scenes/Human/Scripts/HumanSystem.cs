@@ -59,22 +59,38 @@ public class HumanSystem : SystemBase{
         grid.Dispose();
 
         JobHandle jobhandle1 = Entities.WithNone<NeedComponent>().ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc) =>{
-            if (hc.hunger > 75f)
+            if (hc.hunger > 75f){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForFood
                 });
-            else if (hc.fatigue > 75f)
+                ecb.AddComponent<NeedPathParams>(nativeThreadIndex , entity, new NeedPathParams{
+                    searchRadius=2
+                });
+            }
+            else if (hc.fatigue > 75f){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needToRest
                 });
-            else if (hc.sportivity > 75f)
+                ecb.AddComponent<NeedPathParams>(nativeThreadIndex , entity, new NeedPathParams{
+                    searchRadius=2
+                });
+            }
+            else if (hc.sportivity > 75f){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForSport
                 });
-            else if (hc.sociality > 75f)
+                ecb.AddComponent<NeedPathParams>(nativeThreadIndex , entity, new NeedPathParams{
+                    searchRadius=2
+                });
+            }
+            else if (hc.sociality > 75f){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForSociality
                 });
+                ecb.AddComponent<NeedPathParams>(nativeThreadIndex , entity, new NeedPathParams{
+                    searchRadius=2
+                });
+            }
         }).ScheduleParallel(jobhandle);
 
         Entities.ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc, in NeedComponent needComponent) =>{
