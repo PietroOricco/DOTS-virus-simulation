@@ -90,6 +90,9 @@ public class GetNeedPathSystem : SystemBase {
 					}
 				}
 			}
+
+			result.Dispose();
+
 			ecb.RemoveComponent<NeedPathParams>(nativeThreadIndex, entity);
 
 			ecb.AddComponent<PathfindingParams>(nativeThreadIndex , entity, new PathfindingParams{
