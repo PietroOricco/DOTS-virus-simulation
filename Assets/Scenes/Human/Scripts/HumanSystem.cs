@@ -8,23 +8,30 @@ using System;
 using Unity.Mathematics;
 using Unity.Collections;
 
-public class HumanSystem : SystemBase
-{
+
+//Handles increment and decrement of status
+public class HumanSystem : SystemBase{
+    private EndSimulationEntityCommandBufferSystem ecbSystem;
+ 
+    protected override void OnCreate(){
+        ecbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+    }
+
     protected override void OnUpdate(){
-        float deltaTime = Time.DeltaTime;
+        var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
+
         NativeArray<TileMapEnum.TileMapSprite> grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+
         float cellSize = Testing.Instance.grid.GetCellSize();
         int width = Testing.Instance.grid.GetWidth();
 
+        float deltaTime = Time.DeltaTime;
+
         JobHandle jobhandle = Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
-            if(hc.hunger < 100f)
-                hc.hunger += 1f * deltaTime;
-            if (hc.fatigue < 100f)
-                hc.fatigue += 1f * deltaTime;
-            if (hc.sociality < 100f)
-                hc.sociality += 1f * deltaTime;
-            if (hc.sportivity < 100f)
-                hc.sportivity += 1f * deltaTime;
+            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 100f);
+            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 100f);
+            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 100f);
+            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 100f);
 
             GetXY(t.Value, Vector3.zero, cellSize, out int currentX, out int currentY); //TODO fix hardcoded origin
 
@@ -47,39 +54,41 @@ public class HumanSystem : SystemBase
                     hc.sportivity = Math.Max(0, hc.sportivity-2f* deltaTime);
                     break;
             }
-
-            if (hc.hunger > 75f && hc.status == HumanComponent.need.none)
-            {
-                hc.status = HumanComponent.need.needForFood;
-            }
-            else if (hc.fatigue > 75f && hc.status == HumanComponent.need.none) 
-            {
-                hc.status = HumanComponent.need.needToRest;
-            }
-            else if (hc.sportivity > 75f && hc.status == HumanComponent.need.none)
-            {
-                hc.status = HumanComponent.need.needForSport;
-            }
-            else if (hc.sociality > 75f && hc.status == HumanComponent.need.none)
-            {
-                hc.status = HumanComponent.need.needForSociality;
-            }
-
-            if (hc.status!= HumanComponent.need.none)
-            {
-                if (hc.status == HumanComponent.need.needForFood && hc.hunger < 25f)
-                    hc.status = HumanComponent.need.none;
-                else if (hc.status == HumanComponent.need.needToRest && hc.fatigue < 25f)
-                    hc.status = HumanComponent.need.none;
-                else if (hc.status == HumanComponent.need.needForSport && hc.sportivity < 25f)
-                    hc.status = HumanComponent.need.none;
-                else if (hc.status == HumanComponent.need.needForSociality && hc.sociality < 25f)
-                    hc.status = HumanComponent.need.none;
-            }
-
         }).ScheduleParallel(Dependency);
         jobhandle.Complete();
         grid.Dispose();
+
+        JobHandle jobhandle1 = Entities.WithNone<NeedComponent>().ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc) =>{
+            if (hc.hunger > 75f)
+                ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
+                    currentNeed=NeedType.needForFood
+                });
+            else if (hc.fatigue > 75f)
+                ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
+                    currentNeed=NeedType.needToRest
+                });
+            else if (hc.sportivity > 75f)
+                ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
+                    currentNeed=NeedType.needForSport
+                });
+            else if (hc.sociality > 75f)
+                ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
+                    currentNeed=NeedType.needForSociality
+                });
+        }).ScheduleParallel(jobhandle);
+
+        Entities.ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc, in NeedComponent needComponent) =>{
+            if (needComponent.currentNeed == NeedType.needForFood && hc.hunger < 25f)
+                ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
+            else if (needComponent.currentNeed == NeedType.needToRest && hc.fatigue < 25f)
+                ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
+            else if (needComponent.currentNeed == NeedType.needForSport && hc.sportivity < 25f)
+                ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
+            else if (needComponent.currentNeed == NeedType.needForSociality && hc.sociality < 25f)
+                ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
+        }).ScheduleParallel(jobhandle1);
+
+        ecbSystem.AddJobHandleForProducer(Dependency);
     }
 
     private static void GetXY(float3 worldPosition, float3 originPosition, float cellSize, out int x, out int y) {

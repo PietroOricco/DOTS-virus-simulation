@@ -43,7 +43,6 @@ public class Human : MonoBehaviour{
             //human component
             entityManager.SetComponentData(entity, new HumanComponent
             {
-                status = HumanComponent.need.none,
                 hunger = UnityEngine.Random.Range(0, 100f),
                 sportivity = UnityEngine.Random.Range(0, 100f),
                 sociality = UnityEngine.Random.Range(0, 100f),

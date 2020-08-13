@@ -5,16 +5,7 @@ using Unity.Entities;
 
 public struct HumanComponent : IComponentData
 {
-    //status
-    public enum need { 
-        needForFood,
-        needForSport,
-        needForSociality,
-        needToRest,
-        none
-    }
     // human needs
-    public need status;
     public float hunger;        //supermarket
     public float sportivity;    //park 
     public float sociality;     //pub

@@ -27,7 +27,7 @@ public class PlagueSystem : SystemBase{
             ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
                 mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
             });
-        }).Schedule();
+        }).ScheduleParallel();
 
         Entities.WithNone<InfectionComponent>().WithSharedComponentFilter(new RenderMesh{
             mesh = Human.Instance.mesh,
@@ -37,7 +37,7 @@ public class PlagueSystem : SystemBase{
             ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
                 mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
             });
-        }).Schedule();
+        }).ScheduleParallel();
 
         ecbSystem.AddJobHandleForProducer(Dependency);
     }
