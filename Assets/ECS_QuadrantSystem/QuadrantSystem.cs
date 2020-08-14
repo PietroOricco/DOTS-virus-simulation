@@ -110,7 +110,7 @@ public class QuadrantSystem : SystemBase {
             
         }).ScheduleParallel(Dependency);
         jobHandle.Complete();
-        Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(new float3(25f,65f,0))));
+        Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(new float3(0f,0f,0))));
     }
 
 }

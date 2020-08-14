@@ -47,7 +47,9 @@ public class Human : MonoBehaviour{
                 hunger = UnityEngine.Random.Range(0, 100f),
                 sportivity = UnityEngine.Random.Range(0, 100f),
                 sociality = UnityEngine.Random.Range(0, 100f),
-                fatigue = UnityEngine.Random.Range(0, 100f)
+                fatigue = UnityEngine.Random.Range(0, 100f),
+                socialResposibility = UnityEngine.Random.Range(0, 100f) / 100f,
+                infectionCounter = 0
             }); ;
 
             //plague component
@@ -69,8 +71,10 @@ public class Human : MonoBehaviour{
 
             //initial position
             entityManager.SetComponentData(entity, new Translation{
-               //Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
-                Value = new float3(25f, 65f, 0)
+                //Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
+                Value = new float3(UnityEngine.Random.Range(0, 10f), UnityEngine.Random.Range(0, 10f), 0)
+
+                //Value = new float3(25f, 65f, 0)
             });
 
             entityManager.SetComponentData(entity, new PathFollow { 

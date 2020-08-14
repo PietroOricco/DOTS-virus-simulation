@@ -11,4 +11,6 @@ public struct HumanComponent : IComponentData
     public float sociality;     //pub
     public float fatigue;       //home
     // social behavior
+    public float socialResposibility;
+    public float infectionCounter; // counter to track infection exposure, if > threshold human become infected
 }
