@@ -28,10 +28,11 @@ public class Human : MonoBehaviour{
             typeof(LocalToWorld),
             typeof(RenderBounds),
             typeof(MoveSpeedComponent),
-            typeof(PathFollow)
+            typeof(PathFollow),
+            typeof(QuadrantEntity)
         );
 
-        entityArray = new NativeArray<Entity>(100, Allocator.TempJob);
+        entityArray = new NativeArray<Entity>(10, Allocator.TempJob);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
@@ -53,16 +54,23 @@ public class Human : MonoBehaviour{
             if(UnityEngine.Random.Range(0, 10f)>7){
                 entityManager.AddComponentData(entity, new InfectionComponent{
                     infected=true
-                });
-            } 
+
+            });
+                entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Sick });
+            }
+            else
+            {
+                entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Healthy });
+
+            }
 
             //speed
             entityManager.SetComponentData(entity, new MoveSpeedComponent { moveSpeedY = UnityEngine.Random.Range(-2f, 2f), moveSpeedX = UnityEngine.Random.Range(-2f, 2f), });
 
             //initial position
             entityManager.SetComponentData(entity, new Translation{
-                Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
-                //Value = new float3(25f, 65f, 0)
+               //Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
+                Value = new float3(25f, 65f, 0)
             });
 
             entityManager.SetComponentData(entity, new PathFollow { 
@@ -75,6 +83,10 @@ public class Human : MonoBehaviour{
                 mesh = mesh,
                 material = healthyMaterial,
             });
+
+            //quadrantEntity
+            entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Healthy });
+
         }
 
         entityArray.Dispose();

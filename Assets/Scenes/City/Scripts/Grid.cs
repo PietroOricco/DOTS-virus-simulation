@@ -142,7 +142,7 @@ public class Grid<TGridObject> {
     }
 
     public NativeArray<TileMapSprite> GetGridByValue(Func<TGridObject, TileMapSprite> convert){
-        NativeArray<TileMapSprite> grid = new NativeArray<TileMapSprite>(GetWidth()*GetHeight(), Allocator.Temp);
+        NativeArray<TileMapSprite> grid = new NativeArray<TileMapSprite>(GetWidth()*GetHeight(), Allocator.TempJob);
         for(int i = 0; i < GetWidth(); i++){
             for(int j = 0; j < GetHeight(); j++){
                 grid[i+j*GetWidth()] = convert(gridArray[i,j]);

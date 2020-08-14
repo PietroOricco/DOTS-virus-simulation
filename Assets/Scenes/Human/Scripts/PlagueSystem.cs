@@ -38,7 +38,7 @@ public class PlagueSystem : SystemBase{
                 mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
             });
         }).ScheduleParallel();
-
+        //TODO: CHECK IF LINE 38 IS SICKMATERIAL OR HEALTHY MATERIAL
         ecbSystem.AddJobHandleForProducer(Dependency);
     }
 }

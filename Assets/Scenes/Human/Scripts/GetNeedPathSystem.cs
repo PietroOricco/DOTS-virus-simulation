@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
@@ -151,3 +151,4 @@ public class GetNeedPathSystem : SystemBase {
         y = (int)math.floor((worldPosition - originPosition).y / cellSize);
     }
 }
+*/

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Transforms;
@@ -112,3 +112,4 @@ public class HumanSystem : SystemBase{
         y = (int)math.floor((worldPosition - originPosition).y / cellSize);
     }
 }
+*/
