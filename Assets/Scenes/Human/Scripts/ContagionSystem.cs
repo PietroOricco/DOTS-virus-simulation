@@ -23,39 +23,32 @@ public class ContagionSystem : SystemBase
         var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
         float deltaTime = Time.DeltaTime;
-        Entities.WithNone<InfectionComponent>().ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent) =>
+        Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>
         {
-            int hashMapKey = QuadrantSystem.GetPositionHashMapKey(t.Value);
+            if(ic.infected==false){
+                int hashMapKey = QuadrantSystem.GetPositionHashMapKey(t.Value);
 
+                QuadrantData quadrantData;
+                NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
+                if (quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator)){
+                    do{
+                        if (math.distance(t.Value, quadrantData.position) < 2f){
+                            humanComponent.infectionCounter += 5f * deltaTime*(1-humanComponent.socialResposibility);
+                        }
+                    } while (quadrantMultiHashMap.TryGetNextValue(out quadrantData, ref nativeMultiHashMapIterator));
+                }
+                else{
+                    humanComponent.infectionCounter = 0f;
+                }
 
-
-            QuadrantData quadrantData;
-            NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
-            if (quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator))
-            {
-                do
+                if (humanComponent.infectionCounter >= threshold)
                 {
-                    if (math.distance(t.Value, quadrantData.position) < 2f)
-                    {
-                        humanComponent.infectionCounter += 5f * deltaTime*(1-humanComponent.socialResposibility);
-                    }
-                } while (quadrantMultiHashMap.TryGetNextValue(out quadrantData, ref nativeMultiHashMapIterator));
+                    qe.typeEnum = QuadrantEntity.TypeEnum.Sick;
+                    ecb.SetComponent<InfectionComponent>(nativeThreadIndex, entity, new InfectionComponent{
+                        infected = true
+                    });
+                }
             }
-            else
-            {
-                humanComponent.infectionCounter = 0f;
-
-            }
-
-            if (humanComponent.infectionCounter >= threshold)
-            {
-                qe.typeEnum = QuadrantEntity.TypeEnum.Sick;
-                ecb.AddComponent<InfectionComponent>(nativeThreadIndex, entity, new InfectionComponent
-                {
-                    infected = true
-                });
-            }
-
         }).ScheduleParallel();
         ecbSystem.AddJobHandleForProducer(Dependency);
     }

@@ -77,7 +77,7 @@ public class QuadrantSystem : SystemBase {
     }*/
 
     protected override void OnCreate() {
-        quadrantMultiHashMap = new NativeMultiHashMap<int, QuadrantData>(25, Allocator.Persistent);
+        quadrantMultiHashMap = new NativeMultiHashMap<int, QuadrantData>(250000, Allocator.Persistent);
         base.OnCreate();
     }
 
@@ -94,15 +94,11 @@ public class QuadrantSystem : SystemBase {
             quadrantMultiHashMap.Capacity = entityQuery.CalculateEntityCount();
         }
          
-
-    JobHandle jobHandle = Entities.ForEach((Entity entity, Translation t, ref QuadrantEntity qe, in InfectionComponent ic) =>
-        {
+        JobHandle jobHandle = Entities.ForEach((Entity entity, Translation t, ref QuadrantEntity qe, in InfectionComponent ic) =>{
             NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap2 = quadrantMultiHashMap.AsParallelWriter();
 
-
             int hashMapKey = GetPositionHashMapKey(t.Value);
-            quadrantMultiHashMap2.Add(hashMapKey, new QuadrantData
-            {
+            quadrantMultiHashMap2.Add(hashMapKey, new QuadrantData{
                 entity = entity,
                 position = t.Value,
                 quadrantEntity = qe
