@@ -31,7 +31,7 @@ public class Human : MonoBehaviour{
             typeof(PathFollow)
         );
 
-        entityArray = new NativeArray<Entity>(100, Allocator.TempJob);
+        entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
@@ -50,11 +50,26 @@ public class Human : MonoBehaviour{
             }); ;
 
             //plague component
-            if(UnityEngine.Random.Range(0, 10f)>7){
+            if(UnityEngine.Random.Range(0, 10f)<3){
                 entityManager.AddComponentData(entity, new InfectionComponent{
                     infected=true
                 });
-            } 
+                //graphics
+                entityManager.SetSharedComponentData(entity, new RenderMesh{
+                    mesh = mesh,
+                    material = sickMaterial,
+                });
+            }
+            else{
+                entityManager.AddComponentData(entity, new InfectionComponent{
+                    infected=false
+                });
+                //graphics
+                entityManager.SetSharedComponentData(entity, new RenderMesh{
+                    mesh = mesh,
+                    material = healthyMaterial,
+                });
+            }
 
             //speed
             entityManager.SetComponentData(entity, new MoveSpeedComponent { moveSpeedY = UnityEngine.Random.Range(-2f, 2f), moveSpeedX = UnityEngine.Random.Range(-2f, 2f), });
@@ -67,13 +82,6 @@ public class Human : MonoBehaviour{
 
             entityManager.SetComponentData(entity, new PathFollow { 
                 pathIndex = -1 
-            });
-
-            //graphics
-            entityManager.SetSharedComponentData(entity, new RenderMesh
-            {
-                mesh = mesh,
-                material = healthyMaterial,
             });
         }
 
