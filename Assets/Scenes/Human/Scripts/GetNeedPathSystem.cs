@@ -1,4 +1,4 @@
-﻿/*using UnityEngine;
+﻿using UnityEngine;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
@@ -7,9 +7,13 @@ using UnityEditor;
 using Unity.Jobs;
 using Unity.Collections;
 
-
 [UpdateAfter(typeof(PathFollowSystem))]
 public class GetNeedPathSystem : SystemBase {
+
+	private float CellSize;
+    private int Width;
+	private int Height;
+	private NativeArray<TileMapEnum.TileMapSprite> Grid;
 
 	private EndSimulationEntityCommandBufferSystem ecbSystem;
  
@@ -17,14 +21,22 @@ public class GetNeedPathSystem : SystemBase {
         ecbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
+	protected override void OnStartRunning(){
+        CellSize = Testing.Instance.grid.GetCellSize();
+    	Width = Testing.Instance.grid.GetWidth();
+		Height = Testing.Instance.grid.GetHeight();
+		Grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+    }
+
 	protected override void OnUpdate() {
 		var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
-		var cellSize = Testing.Instance.grid.GetCellSize();
-        var width = Testing.Instance.grid.GetWidth();
-		var height = Testing.Instance.grid.GetHeight();
-		var grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
-        JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, ref NeedPathParams needPathParams, ref Translation translation, ref NeedComponent needComponent) => {
+		var cellSize = this.CellSize;
+		var height = this.Height;
+		var width = this.Width;
+		var grid = this.Grid;
+		
+        JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, ref NeedPathParams needPathParams, in Translation translation, in NeedComponent needComponent) => {
 			int range = 2;
 
 			GetXY(translation.Value, Vector3.zero, cellSize, out int startX, out int startY);
@@ -102,7 +114,12 @@ public class GetNeedPathSystem : SystemBase {
 	    }).Schedule(Dependency);
 
         jobHandle.Complete();
-        grid.Dispose();
+
+		ecbSystem.AddJobHandleForProducer(jobHandle);
+    }
+
+	protected override void OnStopRunning(){
+        Grid.Dispose();
     }
 
 	private NativeArray<TileMapEnum.TileMapSprite> GetPlacesForStatus(NeedType currentNeed){
@@ -151,4 +168,3 @@ public class GetNeedPathSystem : SystemBase {
         y = (int)math.floor((worldPosition - originPosition).y / cellSize);
     }
 }
-*/

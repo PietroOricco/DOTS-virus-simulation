@@ -6,6 +6,7 @@ using Unity.Rendering;
 using Unity.Transforms;
 using System;
 using Unity.Collections;
+using Unity.Jobs;
 
 
 public class PlagueSystem : SystemBase{
@@ -19,27 +20,24 @@ public class PlagueSystem : SystemBase{
     protected override void OnUpdate(){
         var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
-        Entities.WithSharedComponentFilter(new RenderMesh{
-            mesh = Human.Instance.mesh,
-            material = Human.Instance.healthyMaterial
-        }).ForEach((Entity entity, int nativeThreadIndex, InfectionComponent ic)=>{
-            // https://forum.unity.com/threads/burst-error-adding-component-frozenrenderscenetag.810753/
-            ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
-                mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
-            });
-        }).ScheduleParallel();
+        JobHandle jobHandle = Entities.WithChangeFilter<InfectionComponent>()
+            .ForEach((Entity entity, int nativeThreadIndex, in InfectionComponent ic)=>{
+            if(ic.infected){
+                ecb.SetSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
+                    mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
+                });
+            }
+            else{
+                ecb.SetSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
+                    mesh = Human.Instance.mesh, material = Human.Instance.healthyMaterial
+                });
+            }
+            
+        }).ScheduleParallel(Dependency);
 
-        Entities.WithNone<InfectionComponent>().WithSharedComponentFilter(new RenderMesh{
-            mesh = Human.Instance.mesh,
-            material = Human.Instance.sickMaterial
-        }).ForEach((Entity entity, int nativeThreadIndex) =>{
-            // https://forum.unity.com/threads/burst-error-adding-component-frozenrenderscenetag.810753/
-            ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
-                mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
-            });
-        }).ScheduleParallel();
-        //TODO: CHECK IF LINE 38 IS SICKMATERIAL OR HEALTHY MATERIAL
-        ecbSystem.AddJobHandleForProducer(Dependency);
+        jobHandle.Complete();
+
+        ecbSystem.AddJobHandleForProducer(jobHandle);
     }
 }
  

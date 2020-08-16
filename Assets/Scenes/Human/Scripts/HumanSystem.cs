@@ -1,4 +1,4 @@
-﻿/*using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Transforms;
@@ -12,20 +12,32 @@ using Unity.Collections;
 //Handles increment and decrement of status
 public class HumanSystem : SystemBase{
     private EndSimulationEntityCommandBufferSystem ecbSystem;
+
+    [ReadOnly]
+    private NativeArray<TileMapEnum.TileMapSprite> Grid;
+    [ReadOnly]
+    private float CellSize;
+    [ReadOnly]
+    private int Width;
  
     protected override void OnCreate(){
         ecbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
+    protected override void OnStartRunning(){
+        Grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+        CellSize = Testing.Instance.grid.GetCellSize();
+        Width = Testing.Instance.grid.GetWidth();
+    }
+
     protected override void OnUpdate(){
         var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
-        NativeArray<TileMapEnum.TileMapSprite> grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
-
-        float cellSize = Testing.Instance.grid.GetCellSize();
-        int width = Testing.Instance.grid.GetWidth();
-
         float deltaTime = Time.DeltaTime;
+
+        var width = Width;
+        var cellSize = CellSize;
+        var grid = Grid;
 
         JobHandle jobhandle = Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
             hc.hunger = math.min(hc.hunger + 1f * deltaTime, 100f);
@@ -56,7 +68,6 @@ public class HumanSystem : SystemBase{
             }
         }).ScheduleParallel(Dependency);
         jobhandle.Complete();
-        grid.Dispose();
 
         JobHandle jobhandle1 = Entities.WithNone<NeedComponent>().ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc) =>{
             if (hc.hunger > 75f){
@@ -93,7 +104,9 @@ public class HumanSystem : SystemBase{
             }
         }).ScheduleParallel(jobhandle);
 
-        Entities.ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc, in NeedComponent needComponent) =>{
+        jobhandle1.Complete();
+
+        JobHandle jobhandle2 = Entities.ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc, in NeedComponent needComponent) =>{
             if (needComponent.currentNeed == NeedType.needForFood && hc.hunger < 25f)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
             else if (needComponent.currentNeed == NeedType.needToRest && hc.fatigue < 25f)
@@ -104,7 +117,13 @@ public class HumanSystem : SystemBase{
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
         }).ScheduleParallel(jobhandle1);
 
-        ecbSystem.AddJobHandleForProducer(Dependency);
+        jobhandle2.Complete();
+
+        ecbSystem.AddJobHandleForProducer(jobhandle2);
+    }
+
+    protected override void OnStopRunning(){
+        Grid.Dispose();
     }
 
     private static void GetXY(float3 worldPosition, float3 originPosition, float cellSize, out int x, out int y) {
@@ -112,4 +131,3 @@ public class HumanSystem : SystemBase{
         y = (int)math.floor((worldPosition - originPosition).y / cellSize);
     }
 }
-*/

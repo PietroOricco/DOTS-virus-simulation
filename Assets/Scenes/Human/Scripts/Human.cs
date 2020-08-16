@@ -32,7 +32,7 @@ public class Human : MonoBehaviour{
             typeof(QuadrantEntity)
         );
 
-        entityArray = new NativeArray<Entity>(10, Allocator.TempJob);
+        entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
@@ -53,17 +53,27 @@ public class Human : MonoBehaviour{
             }); ;
 
             //plague component
-            if(UnityEngine.Random.Range(0, 10f)>7){
+            if(UnityEngine.Random.Range(0, 10f)<3){
                 entityManager.AddComponentData(entity, new InfectionComponent{
                     infected=true
-
-            });
+                });
+                //graphics
+                entityManager.SetSharedComponentData(entity, new RenderMesh{
+                    mesh = mesh,
+                    material = sickMaterial,
+                });
                 entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Sick });
             }
-            else
-            {
+            else{
+                entityManager.AddComponentData(entity, new InfectionComponent{
+                    infected=false
+                });
+                //graphics
+                entityManager.SetSharedComponentData(entity, new RenderMesh{
+                    mesh = mesh,
+                    material = healthyMaterial,
+                });
                 entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Healthy });
-
             }
 
             //speed
@@ -71,8 +81,8 @@ public class Human : MonoBehaviour{
 
             //initial position
             entityManager.SetComponentData(entity, new Translation{
-                //Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
-                Value = new float3(UnityEngine.Random.Range(0, 10f), UnityEngine.Random.Range(0, 10f), 0)
+                Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
+                //Value = new float3(UnityEngine.Random.Range(0, 10f), UnityEngine.Random.Range(0, 10f), 0)
 
                 //Value = new float3(25f, 65f, 0)
             });
@@ -80,17 +90,6 @@ public class Human : MonoBehaviour{
             entityManager.SetComponentData(entity, new PathFollow { 
                 pathIndex = -1 
             });
-
-            //graphics
-            entityManager.SetSharedComponentData(entity, new RenderMesh
-            {
-                mesh = mesh,
-                material = healthyMaterial,
-            });
-
-            //quadrantEntity
-            entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Healthy });
-
         }
 
         entityArray.Dispose();
