@@ -33,7 +33,7 @@ public class PlagueSystem : SystemBase{
                 });
             }
             
-        }).ScheduleParallel(Dependency);
+        }).Schedule(Dependency);
 
         jobHandle.Complete();
 

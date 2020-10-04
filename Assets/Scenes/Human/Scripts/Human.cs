@@ -32,7 +32,7 @@ public class Human : MonoBehaviour{
             typeof(QuadrantEntity)
         );
 
-        entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
+        entityArray = new NativeArray<Entity>(1000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
@@ -77,7 +77,7 @@ public class Human : MonoBehaviour{
             }
 
             //speed
-            entityManager.SetComponentData(entity, new MoveSpeedComponent { moveSpeedY = UnityEngine.Random.Range(-2f, 2f), moveSpeedX = UnityEngine.Random.Range(-2f, 2f), });
+            entityManager.SetComponentData(entity, new MoveSpeedComponent { moveSpeedY = UnityEngine.Random.Range(0.5f, 2f), moveSpeedX = UnityEngine.Random.Range(0.5f, 2f), });
 
             //initial position
             entityManager.SetComponentData(entity, new Translation{

@@ -243,7 +243,7 @@ public class Pathfinding : ComponentSystem {
             PathNode endNode = pathNodeArray[endNodeIndex];
             if (endNode.cameFromNodeIndex == -1) {
                 // Didn't find a path!
-                Debug.Log("Didn't find a path!");
+                //Debug.Log("Didn't find a path!");
                 //pathFollowComponentDataFromEntity[entity] = new PathFollow { pathIndex = -1 };
             } else {
                 // Found a path

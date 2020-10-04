@@ -98,6 +98,7 @@ public class QuadrantSystem : SystemBase {
             NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap2 = quadrantMultiHashMap.AsParallelWriter();
 
             int hashMapKey = GetPositionHashMapKey(t.Value);
+            //Debug.Log(hashMapKey);
             quadrantMultiHashMap2.Add(hashMapKey, new QuadrantData{
                 entity = entity,
                 position = t.Value,
@@ -106,7 +107,7 @@ public class QuadrantSystem : SystemBase {
             
         }).ScheduleParallel(Dependency);
         jobHandle.Complete();
-        Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(new float3(0f,0f,0))));
+        //Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(new float3(0f,0f,0))));
     }
 
 }
