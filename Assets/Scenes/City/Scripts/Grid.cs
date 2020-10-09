@@ -17,6 +17,7 @@ using UnityEngine;
 using TileMapEnum;
 using Unity.Collections;
 
+//Class of the city map
 public class Grid<TGridObject> {
 
     public event EventHandler<OnGridObjectChangedEventArgs> OnGridObjectChanged;
@@ -25,12 +26,14 @@ public class Grid<TGridObject> {
         public int y;
     }
 
+    //params
     private int width;
     private int height;
     private float cellSize;
     private Vector3 originPosition;
     private TGridObject[,] gridArray;
 
+    //constructor with generics
     public Grid(int width, int height, float cellSize, Vector3 originPosition, Func<TileMapSprite, Grid<TGridObject>, int, int, TGridObject> createGridObject) {
         this.width = width;
         this.height = height;
@@ -39,6 +42,7 @@ public class Grid<TGridObject> {
 
         gridArray = new TGridObject[width, height];
 
+        //populate the map, setting fixed roads and the other elements randomly
         for (int x = 0; x < gridArray.GetLength(0); x++){
             for (int y = 0; y < gridArray.GetLength(1); y++){
                 if (x % 3 == 1) gridArray[x, y] = createGridObject(TileMapSprite.Road, this, x, y);
@@ -70,6 +74,7 @@ public class Grid<TGridObject> {
             }
         }
 
+        //debug show the cell borders, set to false since colors work
         bool showDebug = false;
         if (showDebug) {
             TextMesh[,] debugTextArray = new TextMesh[width, height];
@@ -89,6 +94,7 @@ public class Grid<TGridObject> {
         }
     }
 
+    //some getters and setters
     public int GetWidth() {
         return width;
     }
@@ -108,10 +114,12 @@ public class Grid<TGridObject> {
     public void GetXY(Vector3 worldPosition, out int x, out int y) {
         x = Mathf.FloorToInt((worldPosition - originPosition).x / cellSize);
         y = Mathf.FloorToInt((worldPosition - originPosition).y / cellSize);
+
     }
 
     public void SetGridObject(int x, int y, TGridObject value) {
-        if (x >= 0 && y >= 0 && x < width && y < height) {
+        //check if position is inside the grid
+        if (x >= originPosition.x  && y >= originPosition.y && x < width && y < height) {
             gridArray[x, y] = value;
             if (OnGridObjectChanged != null) OnGridObjectChanged(this, new OnGridObjectChangedEventArgs { x = x, y = y });
         }
@@ -128,7 +136,7 @@ public class Grid<TGridObject> {
     }
 
     public TGridObject GetGridObject(int x, int y) {
-        if (x >= 0 && y >= 0 && x < width && y < height) {
+        if (x >= originPosition.x && y >= originPosition.y && x < width && y < height) {
             return gridArray[x, y];
         } else {
             return default(TGridObject);
@@ -141,6 +149,8 @@ public class Grid<TGridObject> {
         return GetGridObject(x, y);
     }
 
+    //create a NativeArray of grid elements, so that we can deal with it in our entities/jobs
+    //way to have a copy without passing the object
     public NativeArray<TileMapSprite> GetGridByValue(Func<TGridObject, TileMapSprite> convert){
         NativeArray<TileMapSprite> grid = new NativeArray<TileMapSprite>(GetWidth()*GetHeight(), Allocator.Persistent);
         for(int i = 0; i < GetWidth(); i++){
