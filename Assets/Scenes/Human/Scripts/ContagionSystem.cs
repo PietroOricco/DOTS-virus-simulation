@@ -12,20 +12,15 @@ public class ContagionSystem : SystemBase
 {
     public NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap2;
     private const float threshold = 20f;
-    private EndSimulationEntityCommandBufferSystem ecbSystem;
 
     protected override void OnCreate()
     {
-        ecbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         quadrantMultiHashMap2 = QuadrantSystem.quadrantMultiHashMap;
     }
 
-    protected override void OnUpdate()
-    {
-        var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
+    protected override void OnUpdate(){
 
         float deltaTime = Time.DeltaTime;
-
         var quadrantMultiHashMap = quadrantMultiHashMap2;
 
         Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
@@ -38,6 +33,7 @@ public class ContagionSystem : SystemBase
                     do{
                         //Debug.Log(quadrantData.position);
                         if (math.distance(t.Value, quadrantData.position) < 2f){
+                            //TODO consider also social resp other human involved
                             humanComponent.infectionCounter += 5f * deltaTime*(1-humanComponent.socialResposibility);
                             //Debug.Log(humanComponent.infectionCounter);
                         }
@@ -51,13 +47,8 @@ public class ContagionSystem : SystemBase
                 {
                     qe.typeEnum = QuadrantEntity.TypeEnum.Sick;
                     ic.infected = true;
-                    //Debug.Log("Contagion");
-                    /*ecb.SetComponent<InfectionComponent>(nativeThreadIndex, entity, new InfectionComponent{
-                        infected = true
-                    });*/
                 }
             }
         }).WithReadOnly(quadrantMultiHashMap).ScheduleParallel();
-        ecbSystem.AddJobHandleForProducer(Dependency);
     }
 }

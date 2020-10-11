@@ -16,6 +16,8 @@ public class Human : MonoBehaviour{
     [SerializeField] public Material healthyMaterial;
     [SerializeField] public Material sickMaterial;
 
+    [SerializeField] public Material humanSpriteMaterial;
+
     private void Awake() {
         Instance = this;
     }
@@ -24,20 +26,20 @@ public class Human : MonoBehaviour{
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(HumanComponent),
             typeof(Translation),
-            typeof(RenderMesh),
-            typeof(LocalToWorld),
-            typeof(RenderBounds),
             typeof(MoveSpeedComponent),
             typeof(PathFollow),
-            typeof(QuadrantEntity)
+            typeof(QuadrantEntity),
+            typeof(SpriteSheetAnimation_Data)
         );
 
-        entityArray = new NativeArray<Entity>(1000, Allocator.Temp);
+        entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
 
         for (int i = 0; i < entityArray.Length; i++){
             Entity entity = entityArray[i];
+
+            Vector3 position = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0);
 
             entityManager.AddBuffer<PathPosition>(entity);
 
@@ -54,14 +56,18 @@ public class Human : MonoBehaviour{
 
             //plague component
             if(UnityEngine.Random.Range(0, 10f)<3){
-                entityManager.AddComponentData(entity, new InfectionComponent{
+                entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
                     infected=true
                 });
                 //graphics
-                entityManager.SetSharedComponentData(entity, new RenderMesh{
-                    mesh = mesh,
-                    material = sickMaterial,
-                });
+                float uvWidth = 1f;
+                float uvHeight = 1f/2;
+                float uvOffsetX = 0f;
+                float uvOffsetY = 0.0f;
+            
+                SpriteSheetAnimation_Data spriteSheetAnimationData;
+                spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
+                spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
                 entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Sick });
             }
             else{
@@ -69,10 +75,14 @@ public class Human : MonoBehaviour{
                     infected=false
                 });
                 //graphics
-                entityManager.SetSharedComponentData(entity, new RenderMesh{
-                    mesh = mesh,
-                    material = healthyMaterial,
-                });
+                float uvWidth = 1f;
+                float uvHeight = 1f/2;
+                float uvOffsetX = 0f;
+                float uvOffsetY = 0.5f;
+            
+                SpriteSheetAnimation_Data spriteSheetAnimationData;
+                spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
+                spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
                 entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Healthy });
             }
 
@@ -81,7 +91,7 @@ public class Human : MonoBehaviour{
 
             //initial position
             entityManager.SetComponentData(entity, new Translation{
-                Value = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0)
+                Value = position
                 //Value = new float3(UnityEngine.Random.Range(0, 10f), UnityEngine.Random.Range(0, 10f), 0)
 
                 //Value = new float3(25f, 65f, 0)

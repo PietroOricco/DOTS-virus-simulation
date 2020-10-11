@@ -20,19 +20,21 @@ public class PlagueSystem : SystemBase{
     protected override void OnUpdate(){
         var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
-        JobHandle jobHandle = Entities.WithChangeFilter<InfectionComponent>()
-            .ForEach((Entity entity, int nativeThreadIndex, in InfectionComponent ic)=>{
+        JobHandle jobHandle = Entities//.WithChangeFilter<InfectionComponent>()
+            .ForEach((Entity entity, int nativeThreadIndex, ref SpriteSheetAnimation_Data spriteSheetAnimationData, in Translation translation, in InfectionComponent ic)=>{
+            float uvOffsetY = 0.5f;
             if(ic.infected){
-                ecb.SetSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
-                    mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
-                });
+                uvOffsetY = 0.0f;
             }
-            else{
-                ecb.SetSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
-                    mesh = Human.Instance.mesh, material = Human.Instance.healthyMaterial
-                });
-            }
+
+            float uvWidth = 1f;
+            float uvHeight = 1f/2;
+            float uvOffsetX = 0f;
             
+            spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
+
+            Vector3 position = translation.Value;
+            spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
         }).ScheduleParallel(Dependency);
 
         jobHandle.Complete();
@@ -40,5 +42,4 @@ public class PlagueSystem : SystemBase{
         ecbSystem.AddJobHandleForProducer(jobHandle);
     }
 }
- 
 

@@ -93,18 +93,19 @@ public class QuadrantSystem : SystemBase {
         if (entityQuery.CalculateEntityCount() > quadrantMultiHashMap.Capacity) {
             quadrantMultiHashMap.Capacity = entityQuery.CalculateEntityCount();
         }
-         
-        JobHandle jobHandle = Entities.ForEach((Entity entity, Translation t, ref QuadrantEntity qe, in InfectionComponent ic) =>{
-            NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap2 = quadrantMultiHashMap.AsParallelWriter();
+        
+        NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap2 = quadrantMultiHashMap.AsParallelWriter(); //TODO smells
 
-            int hashMapKey = GetPositionHashMapKey(t.Value);
-            //Debug.Log(hashMapKey);
-            quadrantMultiHashMap2.Add(hashMapKey, new QuadrantData{
-                entity = entity,
-                position = t.Value,
-                quadrantEntity = qe
-            });
-            
+        JobHandle jobHandle = Entities.ForEach((Entity entity, Translation t, ref QuadrantEntity qe, in InfectionComponent ic) =>{
+            if(ic.infected){   
+                int hashMapKey = GetPositionHashMapKey(t.Value);
+                //Debug.Log(hashMapKey);
+                quadrantMultiHashMap2.Add(hashMapKey, new QuadrantData{
+                    entity = entity,
+                    position = t.Value,
+                    quadrantEntity = qe
+                });
+            }
         }).ScheduleParallel(Dependency);
         jobHandle.Complete();
         //Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(new float3(0f,0f,0))));
