@@ -35,7 +35,7 @@ public class Human : MonoBehaviour{
         entityArray = new NativeArray<Entity>(1000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
-
+        //TODO model social responsibility
         for (int i = 0; i < entityArray.Length; i++){
             Entity entity = entityArray[i];
 

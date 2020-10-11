@@ -9,7 +9,7 @@ using Unity.Mathematics;
 using Unity.Collections;
 
 
-//Handles increment and decrement of status
+
 public class HumanSystem : SystemBase{
     private EndSimulationEntityCommandBufferSystem ecbSystem;
 
@@ -30,6 +30,7 @@ public class HumanSystem : SystemBase{
         Width = Testing.Instance.grid.GetWidth();
     }
 
+    //Handles increment and decrement of parameters of HumanComponent
     protected override void OnUpdate(){
         var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
@@ -40,14 +41,22 @@ public class HumanSystem : SystemBase{
         var grid = Grid;
 
         JobHandle jobhandle = Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
+
+            //increment of 1 value per second for each HumanComponent parameters
             hc.hunger = math.min(hc.hunger + 1f * deltaTime, 100f);
             hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 100f);
             hc.sociality = math.min(hc.sociality + 1f * deltaTime, 100f);
             hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 100f);
 
+            //retrieve entity position
             GetXY(t.Value, Vector3.zero, cellSize, out int currentX, out int currentY); //TODO fix hardcoded origin
 
-            switch(grid[currentX+currentY*width]){
+            //decrement based to position:
+            //home -> decrement fatigue
+            //park -> decrement sociality and sportivity
+            //pub -> decrement hunger and sociality
+            //road -> decrement sportivity
+            switch (grid[currentX+currentY*width]){
                 case TileMapEnum.TileMapSprite.Home:
                     hc.fatigue = Math.Max(0, hc.fatigue-5f* deltaTime);
                     break;
@@ -69,7 +78,10 @@ public class HumanSystem : SystemBase{
         }).ScheduleParallel(Dependency);
         jobhandle.Complete();
 
+        //cycle all the entities without a NeedComponent and assign it according to parameters
         JobHandle jobhandle1 = Entities.WithNone<NeedComponent>().ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc) =>{
+            
+            //set searchRadius for retrieving areas in the map included in that radius if the need is over a certain threshold
             if (hc.hunger > 75f){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForFood
@@ -106,6 +118,7 @@ public class HumanSystem : SystemBase{
 
         jobhandle1.Complete();
 
+        //manage satisfied needs, when value for a parameter decreases under 25 as threshold 
         JobHandle jobhandle2 = Entities.ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc, in NeedComponent needComponent) =>{
             if (needComponent.currentNeed == NeedType.needForFood && hc.hunger < 25f)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);

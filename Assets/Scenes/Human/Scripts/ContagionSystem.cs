@@ -7,6 +7,8 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Jobs;
 
+//System for contagion calculation
+
 [UpdateAfter(typeof(QuadrantSystem))]
 public class ContagionSystem : SystemBase
 {
@@ -29,17 +31,19 @@ public class ContagionSystem : SystemBase
         var quadrantMultiHashMap = quadrantMultiHashMap2;
 
         Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
+            
+            //for non infected entities, a check in the direct neighbours is done for checking the presence of infected 
             if(ic.infected==false){
                 int hashMapKey = QuadrantSystem.GetPositionHashMapKey(t.Value);
                 //Debug.Log("Infected false");
                 QuadrantData quadrantData;
                 NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
                 if (quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator)){
+                    //cycle through all entries oh hashmap with the same Key
                     do{
-                        //Debug.Log(quadrantData.position);
                         if (math.distance(t.Value, quadrantData.position) < 2f){
+                            //increment infectionCounter if one/more infected are in close positions (infected at quadrantData.position) 
                             humanComponent.infectionCounter += 5f * deltaTime*(1-humanComponent.socialResposibility);
-                            //Debug.Log(humanComponent.infectionCounter);
                         }
                     } while (quadrantMultiHashMap.TryGetNextValue(out quadrantData, ref nativeMultiHashMapIterator));
                 }
@@ -47,6 +51,7 @@ public class ContagionSystem : SystemBase
                     humanComponent.infectionCounter = 0f;
                 }
 
+                //infection happened
                 if (humanComponent.infectionCounter >= threshold)
                 {
                     qe.typeEnum = QuadrantEntity.TypeEnum.Sick;
