@@ -7,7 +7,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Jobs;
 
-//system handling the contagion logic
 
 [UpdateAfter(typeof(QuadrantSystem))]
 public class ContagionSystem : SystemBase
@@ -33,6 +32,8 @@ public class ContagionSystem : SystemBase
 
         //job -> each element, if not infected, check if there are infected in its same quadrant
         Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
+            
+            //for non infected entities, a check in the direct neighbours is done for checking the presence of infected 
             if(ic.infected==false){
                 //not infected-> look for infected in same cell
                 int hashMapKey = QuadrantSystem.GetPositionHashMapKey(t.Value);
@@ -40,13 +41,14 @@ public class ContagionSystem : SystemBase
                 QuadrantData quadrantData;
                 NativeMultiHashMapIterator<int> nativeMultiHashMapIterator;
                 if (quadrantMultiHashMap.TryGetFirstValue(hashMapKey, out quadrantData, out nativeMultiHashMapIterator)){
+                    //cycle through all entries oh hashmap with the same Key
                     do{
-                        //Debug.Log(quadrantData.position);
-                        //found infected in same quadrant -> if too close, increment infection Counter
+                        //Debug.Log(quadrantData.position);                       
                         if (math.distance(t.Value, quadrantData.position) < 2f){
+                            //increment infectionCounter if one/more infected are in close positions (infected at quadrantData.position) 
                             //infection counter is determined by time and human responsibility
+
                             humanComponent.infectionCounter += 5f * deltaTime*(1-humanComponent.socialResposibility);
-                            //Debug.Log(humanComponent.infectionCounter);
                         }
                     } while (quadrantMultiHashMap.TryGetNextValue(out quadrantData, ref nativeMultiHashMapIterator));
                 }
@@ -55,6 +57,7 @@ public class ContagionSystem : SystemBase
                     humanComponent.infectionCounter = 0f;
                 }
 
+                //infection happened
                 if (humanComponent.infectionCounter >= threshold)
                 {
                     //human become infected
