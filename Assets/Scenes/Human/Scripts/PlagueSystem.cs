@@ -42,4 +42,3 @@ public class PlagueSystem : SystemBase{
         ecbSystem.AddJobHandleForProducer(jobHandle);
     }
 }
-
