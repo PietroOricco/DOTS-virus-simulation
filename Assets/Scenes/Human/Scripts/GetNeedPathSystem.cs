@@ -70,20 +70,25 @@ public class GetNeedPathSystem : SystemBase {
 					break;	
 			}
 
-
-			if (ArrayUtility.Contains(result.ToArray(), grid[startX + startY * width])){
-				endX = startX;
-				endY = startY;
-				found = true;
+			for(int l=0; l < result.Length; l++){
+				if (result[l]==grid[startX + startY * width]){
+					endX = startX;
+					endY = startY;
+					found = true;
+				}
 			}
+
+			
 
 			for (i = startX - range; i < startX + range && !found ; i++) {
 				for (j = startY - range; j < startY + range && !found; j++) {
 					if (i >= 0 && j >= 0 && i < width && j < height )
-						if (ArrayUtility.Contains(result.ToArray(), grid[i+j*width])){
-							endX = i;
-							endY = j;
-							found = true;
+						for(int l=0; l < result.Length; l++){
+							if (result[l]==grid[i+j*width]){
+								endX = i;
+								endY = j;
+								found = true;
+							}
 						}
 				}
 			}
@@ -94,10 +99,12 @@ public class GetNeedPathSystem : SystemBase {
 				for (i = startX - range; i < startX + range && !found ; i++) {
 					for (j = startY - range; j < startY + range && !found; j++) {
 						if (i >= 0 && j >= 0 && i < width && j < height )
-							if (ArrayUtility.Contains(result.ToArray(), grid[i+j*width])){
-								endX = i;
-								endY = j;
-								found = true;
+							for(int l=0; l < result.Length; l++){
+								if (result[l]==grid[i+j*width]){
+									endX = i;
+									endY = j;
+									found = true;
+								}
 							}
 					}
 				}

@@ -54,20 +54,20 @@ public class Human : MonoBehaviour{
                 infectionCounter = 0
             }); ;
 
-            //plague component
-            if(UnityEngine.Random.Range(0, 10f)<3){
+            //components depending on infection
+            float uvWidth = 1f;
+            float uvHeight = 1f/2;
+            float uvOffsetX = 0f;
+            if(UnityEngine.Random.Range(0, 10f)<0.001){
                 entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
                     infected=true
                 });
                 //graphics
-                float uvWidth = 1f;
-                float uvHeight = 1f/2;
-                float uvOffsetX = 0f;
                 float uvOffsetY = 0.0f;
-            
                 SpriteSheetAnimation_Data spriteSheetAnimationData;
                 spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
                 spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
+                //quadrant
                 entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Sick });
             }
             else{
@@ -75,14 +75,11 @@ public class Human : MonoBehaviour{
                     infected=false
                 });
                 //graphics
-                float uvWidth = 1f;
-                float uvHeight = 1f/2;
-                float uvOffsetX = 0f;
                 float uvOffsetY = 0.5f;
-            
                 SpriteSheetAnimation_Data spriteSheetAnimationData;
                 spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
                 spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
+                //quadrant
                 entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Healthy });
             }
 
@@ -92,9 +89,6 @@ public class Human : MonoBehaviour{
             //initial position
             entityManager.SetComponentData(entity, new Translation{
                 Value = position
-                //Value = new float3(UnityEngine.Random.Range(0, 10f), UnityEngine.Random.Range(0, 10f), 0)
-
-                //Value = new float3(25f, 65f, 0)
             });
 
             entityManager.SetComponentData(entity, new PathFollow { 
