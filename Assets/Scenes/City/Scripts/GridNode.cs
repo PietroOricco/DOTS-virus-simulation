@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TileMapEnum;
 
+//element of each cell, set the param iswalkable if road in order to perform proper pathfinding
 public class GridNode {
 
     private Grid<GridNode> grid;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TileMapEnum;
 
+
+//
 public class CityVisual : MonoBehaviour
 {
     private Grid<GridNode> grid;
@@ -24,7 +26,9 @@ public class CityVisual : MonoBehaviour
 
     private void UpdateVisual()
     {
+        //create mesh for the whole map
         MeshUtils.CreateEmptyMeshArrays(grid.GetWidth() * grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
+        //create proper color for each cell
         for (int i = 0; i<grid.GetWidth(); i++)
         {
             for (int j=0; j<grid.GetHeight(); j++)
@@ -33,6 +37,8 @@ public class CityVisual : MonoBehaviour
                 Vector3 quadsize = new Vector3(1, 1) * grid.GetCellSize();
                 TileMapSprite value = grid.GetGridObject(i, j).GetTileType();
                 Vector2 gridValueUV;
+
+                //based on type of cell, decide color
                 if (value == TileMapSprite.Road){
                     gridValueUV = Vector2.zero;
                 }
@@ -51,6 +57,7 @@ public class CityVisual : MonoBehaviour
                 else{
                     gridValueUV = Vector2.zero;
                 }
+                //set mesh created and position offset (center of the cell)
                 MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(i,j)+quadsize*0.5f, 0f, quadsize, gridValueUV, gridValueUV);
 
             }

@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Custom class to create and generate mesh
 public static class MeshUtils {
     
     private static readonly Vector3 Vector3zero = Vector3.zero;

@@ -6,6 +6,7 @@ using Unity.Rendering;
 using Unity.Transforms;
 using System;
 using Unity.Collections;
+using Unity.Jobs;
 
 
 public class PlagueSystem : SystemBase{
@@ -19,28 +20,25 @@ public class PlagueSystem : SystemBase{
     protected override void OnUpdate(){
         var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
-        Entities.WithSharedComponentFilter(new RenderMesh{
-            mesh = Human.Instance.mesh,
-            material = Human.Instance.healthyMaterial
-        }).ForEach((Entity entity, int nativeThreadIndex, InfectionComponent ic)=>{
-            // https://forum.unity.com/threads/burst-error-adding-component-frozenrenderscenetag.810753/
-            ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
-                mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
-            });
-        }).Schedule();
+        JobHandle jobHandle = Entities//.WithChangeFilter<InfectionComponent>()
+            .ForEach((Entity entity, int nativeThreadIndex, ref SpriteSheetAnimation_Data spriteSheetAnimationData, in Translation translation, in InfectionComponent ic)=>{
+            float uvOffsetY = 0.5f;
+            if(ic.infected){
+                uvOffsetY = 0.0f;
+            }
 
-        Entities.WithNone<InfectionComponent>().WithSharedComponentFilter(new RenderMesh{
-            mesh = Human.Instance.mesh,
-            material = Human.Instance.sickMaterial
-        }).ForEach((Entity entity, int nativeThreadIndex) =>{
-            // https://forum.unity.com/threads/burst-error-adding-component-frozenrenderscenetag.810753/
-            ecb.AddSharedComponent<RenderMesh>(nativeThreadIndex, entity, new RenderMesh{
-                mesh = Human.Instance.mesh, material = Human.Instance.sickMaterial
-            });
-        }).Schedule();
+            float uvWidth = 1f;
+            float uvHeight = 1f/2;
+            float uvOffsetX = 0f;
+            
+            spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
 
-        ecbSystem.AddJobHandleForProducer(Dependency);
+            Vector3 position = translation.Value;
+            spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
+        }).ScheduleParallel(Dependency);
+
+        jobHandle.Complete();
+
+        ecbSystem.AddJobHandleForProducer(jobHandle);
     }
 }
- 
-
