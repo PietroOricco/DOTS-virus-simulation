@@ -58,7 +58,7 @@ public class Human : MonoBehaviour{
             float uvWidth = 1f;
             float uvHeight = 1f/2;
             float uvOffsetX = 0f;
-            if(UnityEngine.Random.Range(0, 10f)<0.001){
+            if(UnityEngine.Random.Range(0, 1f)<0.0001){
                 entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
                     infected=true
                 });
