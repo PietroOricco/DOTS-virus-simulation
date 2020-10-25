@@ -15,6 +15,10 @@ public class GetNeedPathSystem : SystemBase {
 	private int Height;
 	private NativeArray<TileMapEnum.TileMapSprite> Grid;
 
+	private NativeArray<int2> directions;
+	private NativeArray<int2> start_offset;
+	private Unity.Mathematics.Random rnd;
+
 	private EndSimulationEntityCommandBufferSystem ecbSystem;
  
     protected override void OnCreate(){
@@ -26,6 +30,11 @@ public class GetNeedPathSystem : SystemBase {
     	Width = Testing.Instance.grid.GetWidth();
 		Height = Testing.Instance.grid.GetHeight();
 		Grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+		directions = new NativeArray<int2>(4, Allocator.Persistent);
+		directions.CopyFrom(new int2[] {new int2(1, 0), new int2(0, -1), new int2(-1, 0), new int2(0, 1)});
+		start_offset = new NativeArray<int2>(4, Allocator.Persistent);
+		start_offset.CopyFrom(new int2[] {new int2(-1, 1), new int2(1, 1), new int2(1, -1), new int2(-1, -1)});
+		rnd = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(0,420));
     }
 
 	protected override void OnUpdate() {
@@ -35,17 +44,9 @@ public class GetNeedPathSystem : SystemBase {
 		var height = this.Height;
 		var width = this.Width;
 		var grid = this.Grid;
-
-		
-		//int2 directions = new int2[] {(1, 0), (0, -1), (-1, 0), (0, 1)};
-		NativeArray<int2> directions = new NativeArray<int2>(4, Allocator.Temp);
-		directions.CopyFrom(new int2[] {new int2(1, 0), new int2(0, -1), new int2(-1, 0), new int2(0, 1)});
-		//start_offset_x = ;
-		//start_offset_y = new (int, int)[] {(-1, 1), (1, 1), (1, -1), (-1, -1)};
-		NativeArray<int2> start_offset = new NativeArray<int2>(4, Allocator.Temp);
-		start_offset.CopyFrom(new int2[] {new int2(-1, 1), new int2(1, 1), new int2(1, -1), new int2(-1, -1)});
-
-		Unity.Mathematics.Random rnd = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(0,420));
+		var rnd = this.rnd;
+		var start_offset = this.start_offset;
+		var directions = this.directions;
 		
         JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, ref NeedPathParams needPathParams, in Translation translation, in NeedComponent needComponent) => {
 
@@ -93,8 +94,8 @@ public class GetNeedPathSystem : SystemBase {
 				//random number selection
 				int starting_edge = rnd.NextInt(0, 4);
 				int pos_step = rnd.NextInt(0, range*2+1);
-				i = start_offset[starting_edge].x*range + directions[starting_edge].x*pos_step;
-				j = start_offset[starting_edge].y*range + directions[starting_edge].y*pos_step;
+				i = startX + start_offset[starting_edge].x*range + directions[starting_edge].x*pos_step;
+				j = startY + start_offset[starting_edge].y*range + directions[starting_edge].y*pos_step;
 				for(int turns = 0, tot_step = 0; turns<5&&tot_step<8*range; turns++){
 					//TODO random starting step?
 					var edge = (turns+starting_edge)%4;

@@ -45,6 +45,7 @@ public class ContagionSystem : SystemBase
                             //infection counter is determined by time and human responsibility
                             humanComponent.infectionCounter += 5f * deltaTime*(1-humanComponent.socialResposibility);
                         }
+                    //TODO we could add a cap here to speed up the check
                     } while (quadrantMultiHashMap.TryGetNextValue(out quadrantData, ref nativeMultiHashMapIterator));
                 }
                 else{
