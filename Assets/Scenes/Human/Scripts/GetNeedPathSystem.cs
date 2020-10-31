@@ -15,6 +15,10 @@ public class GetNeedPathSystem : SystemBase {
 	private int Height;
 	private NativeArray<TileMapEnum.TileMapSprite> Grid;
 
+	private NativeArray<int2> directions;
+	private NativeArray<int2> start_offset;
+	private Unity.Mathematics.Random rnd;
+
 	private EndSimulationEntityCommandBufferSystem ecbSystem;
  
     protected override void OnCreate(){
@@ -26,6 +30,11 @@ public class GetNeedPathSystem : SystemBase {
     	Width = Testing.Instance.grid.GetWidth();
 		Height = Testing.Instance.grid.GetHeight();
 		Grid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+		directions = new NativeArray<int2>(4, Allocator.Persistent);
+		directions.CopyFrom(new int2[] {new int2(1, 0), new int2(0, -1), new int2(-1, 0), new int2(0, 1)});
+		start_offset = new NativeArray<int2>(4, Allocator.Persistent);
+		start_offset.CopyFrom(new int2[] {new int2(-1, 1), new int2(1, 1), new int2(1, -1), new int2(-1, -1)});
+		rnd = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(0,420));
     }
 
 	protected override void OnUpdate() {
@@ -35,9 +44,11 @@ public class GetNeedPathSystem : SystemBase {
 		var height = this.Height;
 		var width = this.Width;
 		var grid = this.Grid;
+		var rnd = this.rnd;
+		var start_offset = this.start_offset;
+		var directions = this.directions;
 		
         JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, ref NeedPathParams needPathParams, in Translation translation, in NeedComponent needComponent) => {
-			int range = 2;
 
 			GetXY(translation.Value, Vector3.zero, cellSize, out int startX, out int startY);
 
@@ -78,35 +89,28 @@ public class GetNeedPathSystem : SystemBase {
 				}
 			}
 
-			
-
-			for (i = startX - range; i < startX + range && !found ; i++) {
-				for (j = startY - range; j < startY + range && !found; j++) {
-					if (i >= 0 && j >= 0 && i < width && j < height )
-						for(int l=0; l < result.Length; l++){
-							if (result[l]==grid[i+j*width]){
-								endX = i;
-								endY = j;
-								found = true;
-							}
-						}
-				}
-			}
-
-			for(int tmax = 0; tmax < 5 && !found; tmax++){
-				range *= 2;
-				//pos = FindTarget(startX, startY, hc.status, range, grid, width, height);
-				for (i = startX - range; i < startX + range && !found ; i++) {
-					for (j = startY - range; j < startY + range && !found; j++) {
-						if (i >= 0 && j >= 0 && i < width && j < height )
-							for(int l=0; l < result.Length; l++){
+			//TODO this could esplode... keep an eye on this
+			for(int range = 1; !found; range++){
+				//random number selection
+				int starting_edge = rnd.NextInt(0, 4);
+				int pos_step = rnd.NextInt(0, range*2+1);
+				i = startX + start_offset[starting_edge].x*range + directions[starting_edge].x*pos_step;
+				j = startY + start_offset[starting_edge].y*range + directions[starting_edge].y*pos_step;
+				for(int turns = 0, tot_step = 0; turns<5&&tot_step<8*range; turns++){
+					//TODO random starting step?
+					var edge = (turns+starting_edge)%4;
+					for(int steps = pos_step; steps<range*2+1-pos_step && !found; steps++){
+						i += directions[edge].x;
+						j += directions[edge].y;
+						if(i>=0&&i<width&&j>=0&&j<height)
+							for(int l=0; l < result.Length && !found; l++)
 								if (result[l]==grid[i+j*width]){
 									endX = i;
 									endY = j;
 									found = true;
 								}
-							}
 					}
+					pos_step = 0;
 				}
 			}
 

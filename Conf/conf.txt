@@ -1,0 +1,4 @@
+{
+   "numberOfHumans" : 100000, 
+   "numberOfInfects" : 100
+}
