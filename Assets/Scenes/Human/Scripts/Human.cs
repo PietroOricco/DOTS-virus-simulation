@@ -32,7 +32,7 @@ public class Human : MonoBehaviour{
             typeof(SpriteSheetAnimation_Data)
         );
 
-        entityArray = new NativeArray<Entity>(100000, Allocator.Temp);
+        entityArray = new NativeArray<Entity>(10000, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
         //TODO model social responsibility
@@ -58,10 +58,11 @@ public class Human : MonoBehaviour{
             float uvWidth = 1f;
             float uvHeight = 1f/2;
             float uvOffsetX = 0f;
-            if(UnityEngine.Random.Range(0, 10f)<0.001){
+            if(UnityEngine.Random.Range(0, 10f)<0.01){
                 entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
                     infected=true
                 });
+                Counter.infectedCounter++;
                 //graphics
                 float uvOffsetY = 0.0f;
                 SpriteSheetAnimation_Data spriteSheetAnimationData;

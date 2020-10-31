@@ -56,6 +56,7 @@ public class ContagionSystem : SystemBase
                 if (humanComponent.infectionCounter >= threshold)
                 {
                     //human become infected
+                    Counter.infectedCounter++;
                     qe.typeEnum = QuadrantEntity.TypeEnum.Sick;
                     ic.infected = true;
                 }
