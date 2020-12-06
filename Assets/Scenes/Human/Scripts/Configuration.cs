@@ -6,6 +6,9 @@ public class Configuration
 {
     public int numberOfHumans;
     public int numberOfInfects;
+    public float timeScale;
+    public float probabilityOfSymptomatic;
+    public float probabilityOfDeath;
 
     public static Configuration CreateFromJSON()
     {
