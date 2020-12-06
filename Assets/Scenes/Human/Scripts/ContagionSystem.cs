@@ -23,15 +23,16 @@ public class ContagionSystem : SystemBase
     protected override void OnUpdate(){
 
         float deltaTime = Time.DeltaTime;
-        float symptomsProbability;
-        float deathProbability;
+       
+       
         var quadrantMultiHashMap = quadrantMultiHashMap2;
 
         //job -> each element, if not infected, check if there are infected in its same quadrant
         Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
-            
+            float symptomsProbability;
+            float deathProbability;
             //for non infected entities, a check in the direct neighbours is done for checking the presence of infected 
-            if(ic.status == Status.susceptible){
+            if (ic.status == Status.susceptible){
                 //not infected-> look for infected in same cell
                 int hashMapKey = QuadrantSystem.GetPositionHashMapKey(t.Value);
                 //Debug.Log("Infected false");
