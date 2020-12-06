@@ -55,8 +55,9 @@ public class Human : MonoBehaviour{
                 sociality = UnityEngine.Random.Range(0, 100f),
                 fatigue = UnityEngine.Random.Range(0, 100f),
                 socialResposibility = UnityEngine.Random.Range(0, 100f) / 100f,
-                infectionCounter = 0
-            }); ;
+            }) ;
+
+            Time.timeScale = conf.timeScale;
 
             //components depending on infection
             float uvWidth = 1f;
@@ -66,7 +67,19 @@ public class Human : MonoBehaviour{
             if(numberOfInfects > 0){
                 numberOfInfects--;
                 entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
-                    infected=true
+                    infected=true,
+                    status = Status.exposed,
+                    contagionCounter = 0,
+                    infectiousCounter = 0,
+                    exposedCounter = 0,
+                    recoveredCounter = 0,
+
+                    symptomsProbability = conf.probabilityOfSymptomatic,
+                    deathProbability = conf.probabilityOfDeath,
+
+                    infectiousThreshold = 0,
+                    exposedThreshold = 0,
+                    recoveredThreshold = 0
                 });
                 Counter.infectedCounter++;
                 //graphics
@@ -75,11 +88,22 @@ public class Human : MonoBehaviour{
                 spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
                 spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
                 //quadrant
-                entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Sick });
+                entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.exposed });
             }
             else{
                 entityManager.AddComponentData(entity, new InfectionComponent{
-                    infected=false
+                    infected=false,
+                    status = Status.susceptible,
+                    contagionCounter = 0,
+                    infectiousCounter = 0,
+                    exposedCounter = 0,
+                    recoveredCounter = 0,
+
+                    symptomsProbability = 0,
+
+                    infectiousThreshold = 0,
+                    exposedThreshold = 0,
+                    recoveredThreshold = 0
                 });
                 //graphics
                 float uvOffsetY = 0.5f;
@@ -87,7 +111,7 @@ public class Human : MonoBehaviour{
                 spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
                 spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
                 //quadrant
-                entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.Healthy });
+                entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.susceptible });
             }
 
             //speed

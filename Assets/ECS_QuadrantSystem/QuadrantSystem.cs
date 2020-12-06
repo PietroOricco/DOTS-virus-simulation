@@ -25,8 +25,10 @@ public struct QuadrantEntity : IComponentData {
     public TypeEnum typeEnum;
 
     public enum TypeEnum {
-        Healthy,
-        Sick
+        susceptible,
+        exposed,
+        infectious,
+        removed
     }
 }
 
