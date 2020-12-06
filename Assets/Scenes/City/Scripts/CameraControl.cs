@@ -4,13 +4,12 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-    public float zoomSpeed = 100;
-    public float targetOrtho;
-    public float smoothSpeed = 200.0f;
-    public float minOrtho = 1.0f;
-    public float maxOrtho = 250.0f;
-
-    private bool edge_scrolling = false;
+    private float zoomSpeed =30f;
+    private float targetOrtho = 200f;
+    private float smoothSpeed = 2000.0f;
+    private float minOrtho = 1f;
+    private float maxOrtho = 250.0f;
+    private float defaultMoveSpeed = 15f;
 
     void Start()
     {
@@ -19,29 +18,41 @@ public class CameraControl : MonoBehaviour
 
     void Update()
     {
+        float moveX = 0;
+        float moveY = 0;
+        float moveZ = 0;
+        float moveSpeed = targetOrtho/maxOrtho * defaultMoveSpeed;
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            edge_scrolling = !edge_scrolling;
+        if (Input.GetKey(KeyCode.W)){
+            moveY += moveSpeed;
         }
 
-        if (edge_scrolling)
-        {
-            float mouseX = (Input.mousePosition.x / Screen.width) - 0.5f;
-            float mouseY = (Input.mousePosition.y / Screen.height) - 0.5f;
-            if (Mathf.Abs(mouseX) < 0.25) mouseX = 0;
-            if (Mathf.Abs(mouseY) < 0.25) mouseY = 0;
-            transform.position = transform.position + 10f * (new Vector3(mouseX, mouseY, 0));
+        if (Input.GetKey(KeyCode.S)){
+            moveY -= moveSpeed;
         }
 
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll != 0.0f)
-        {
-            targetOrtho -= scroll * zoomSpeed;
-            targetOrtho = Mathf.Clamp(targetOrtho, minOrtho, maxOrtho);
+        if (Input.GetKey(KeyCode.A)){
+            moveX -= moveSpeed;
         }
 
-        Camera.main.orthographicSize = Mathf.MoveTowards(Camera.main.orthographicSize, targetOrtho, smoothSpeed * Time.deltaTime);
+        if (Input.GetKey(KeyCode.D)){
+            moveX += moveSpeed;
+        }
+
+        if (Input.GetKey(KeyCode.Q)){
+            moveZ += zoomSpeed;
+        }
+
+        if (Input.GetKey(KeyCode.E)){
+            moveZ -= zoomSpeed;
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, transform.position + defaultMoveSpeed * (new Vector3(moveX, moveY, 0)), 2*defaultMoveSpeed*Time.deltaTime);
+
+        targetOrtho -= moveZ;
+        targetOrtho = Mathf.Clamp(targetOrtho, minOrtho, maxOrtho);
+
+        Camera.main.orthographicSize = Mathf.MoveTowards(Camera.main.orthographicSize, targetOrtho, 2*Mathf.Abs(moveZ*Time.deltaTime));
 
     }
 }
