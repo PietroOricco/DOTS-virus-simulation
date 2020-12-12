@@ -15,6 +15,7 @@ public enum Status
 public struct InfectionComponent : IComponentData
 {
     public Boolean infected;
+    public Boolean symptomatic; 
     
     public Status status;
 

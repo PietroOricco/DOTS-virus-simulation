@@ -81,6 +81,7 @@ public class ContagionSystem : SystemBase
                     if (symptomsProbability > (1 - ic.symptomsProbability))
                     {
                         //symptomatic -> lasts between 0.5 and 1.5 day
+                        ic.symptomatic = true;
                         float mean = (0.5f + 1.5f) * 3600 * 24 / 2;
                         float sigma = (1.5f * 3600 * 24 - mean) / 3;
 
@@ -90,6 +91,8 @@ public class ContagionSystem : SystemBase
                     else
                     {
                         //asymptomatic
+                        ic.symptomatic = false;
+
                         float mean = (2 + 4) * 3600 * 24 / 2;
                         float sigma = (4 * 3600 * 24 - mean) / 3;
 

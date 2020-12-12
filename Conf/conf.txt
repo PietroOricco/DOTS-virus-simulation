@@ -1,7 +1,7 @@
 {
    "numberOfHumans" : 100000, 
    "numberOfInfects" : 100,
-   "timeScale" : 1
-   "probabilityOfSymptomatic" : 58
+   "timeScale" : 1,
+   "probabilityOfSymptomatic" : 58,
    "probabilityOfDeath" : 5
 }
