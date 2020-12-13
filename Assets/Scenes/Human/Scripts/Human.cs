@@ -50,10 +50,10 @@ public class Human : MonoBehaviour{
             //human component
             entityManager.SetComponentData(entity, new HumanComponent
             {
-                hunger = UnityEngine.Random.Range(0, 100f),
-                sportivity = UnityEngine.Random.Range(0, 100f),
-                sociality = UnityEngine.Random.Range(0, 100f),
-                fatigue = UnityEngine.Random.Range(0, 100f),
+                hunger = UnityEngine.Random.Range(0, 10*3600),
+                sportivity = UnityEngine.Random.Range(0, 10 * 3600),
+                sociality = UnityEngine.Random.Range(0, 10 * 3600),
+                fatigue = UnityEngine.Random.Range(0, 10 * 3600),
                 socialResposibility = UnityEngine.Random.Range(0, 100f) / 100f,
             }) ;
 

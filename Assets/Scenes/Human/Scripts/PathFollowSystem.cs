@@ -24,7 +24,7 @@ public class PathFollowSystem : JobComponentSystem {
 
                 float3 targetPosition = new float3(pathPosition.position.x*cellSize+cellSize*0.5f, pathPosition.position.y*cellSize+cellSize*0.5f, 0);
                 float3 moveDir = math.normalizesafe(targetPosition - translation.Value);
-                float moveSpeed = 10f;
+                float moveSpeed = 1f;
 
                 translation.Value += moveDir * moveSpeed * deltaTime;
                 

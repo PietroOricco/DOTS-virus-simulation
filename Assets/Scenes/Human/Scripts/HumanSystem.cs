@@ -43,10 +43,10 @@ public class HumanSystem : SystemBase{
         JobHandle jobhandle = Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
 
             //increment of 1 value per second for each HumanComponent parameters
-            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 100f);
-            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 100f);
-            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 100f);
-            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 100f);
+            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 25 * 3600);
+            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 25 * 3600);
+            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 25 * 3600);
+            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 25 * 3600);
 
             //retrieve entity position
             GetXY(t.Value, Vector3.zero, cellSize, out int currentX, out int currentY); //TODO fix hardcoded origin
