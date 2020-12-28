@@ -22,6 +22,8 @@ public class Human : MonoBehaviour{
         Instance = this;
     }
     private void Start(){
+        float mean, sigma;
+
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(HumanComponent),
@@ -50,13 +52,14 @@ public class Human : MonoBehaviour{
             //human component
             entityManager.SetComponentData(entity, new HumanComponent
             {
-                hunger = UnityEngine.Random.Range(0, 10*3600),
-                sportivity = UnityEngine.Random.Range(0, 10 * 3600),
-                sociality = UnityEngine.Random.Range(0, 10 * 3600),
-                fatigue = UnityEngine.Random.Range(0, 10 * 3600),
+                hunger = UnityEngine.Random.Range(0, 10*60),
+                sportivity = UnityEngine.Random.Range(0, 10 * 60),
+                sociality = UnityEngine.Random.Range(0, 10 * 60),
+                fatigue = UnityEngine.Random.Range(0, 10 * 60),
                 socialResposibility = UnityEngine.Random.Range(0, 100f) / 100f,
             }) ;
 
+            //Time Scale
             Time.timeScale = conf.timeScale;
 
             //components depending on infection
@@ -66,6 +69,36 @@ public class Human : MonoBehaviour{
             
             if(numberOfInfects > 0){
                 numberOfInfects--;
+
+                float symptomsProbability = UnityEngine.Random.Range(0, 100);
+                float infectiousThreshold, recoveredThreshold, exposedThreshold;
+                if(symptomsProbability > 1 - conf.probabilityOfSymptomatic)
+                {
+                    mean = (0.5f + 1.5f) * 60 * 24 / 2;
+                    sigma = (1.5f * 60 * 24 - mean) / 3;
+                }
+                else
+                {
+                    mean = (2 + 4) * 60 * 24 / 2;
+                    sigma = (4 * 60 * 24 - mean) / 3;
+                }
+
+                infectiousThreshold = GenerateNormalRandom(mean, sigma, 2 * 24 * 60, 4 * 24 * 60);
+
+                float humanDeathProbability = UnityEngine.Random.Range(0, 100);
+                if (humanDeathProbability <= 1 - conf.probabilityOfDeath)
+                {
+                    mean = (30 + 45) * 60 * 24 / 2;
+                    sigma = (45 * 60 * 24 - mean) / 3;
+                }
+
+                recoveredThreshold = GenerateNormalRandom(mean, sigma, 30 * 24 * 60, 45 * 24 * 60);
+
+                mean = (3 + 6) * 60 * 24 / 2;
+                sigma = (6 * 60 * 24 - mean) / 3;
+
+                exposedThreshold = GenerateNormalRandom(mean, sigma, 3 * 60 * 24, 6 * 60 * 24);
+
                 entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
                     infected=true,
                     status = Status.exposed,
@@ -74,12 +107,15 @@ public class Human : MonoBehaviour{
                     exposedCounter = 0,
                     recoveredCounter = 0,
 
-                    symptomsProbability = conf.probabilityOfSymptomatic,
-                    deathProbability = conf.probabilityOfDeath,
+                    globalSymptomsProbability = conf.probabilityOfSymptomatic,
+                    globalDeathProbability = conf.probabilityOfDeath,
 
-                    infectiousThreshold = 0,
-                    exposedThreshold = 0,
-                    recoveredThreshold = 0
+                    humanSymptomsProbability = symptomsProbability,
+                    humanDeathProbability = humanDeathProbability,
+
+                    infectiousThreshold = infectiousThreshold,
+                    exposedThreshold = exposedThreshold,
+                    recoveredThreshold = recoveredThreshold
                 });
                 Counter.infectedCounter++;
                 //graphics
@@ -91,6 +127,36 @@ public class Human : MonoBehaviour{
                 entityManager.SetComponentData(entity, new QuadrantEntity { typeEnum = QuadrantEntity.TypeEnum.exposed });
             }
             else{
+
+                float symptomsProbability = UnityEngine.Random.Range(0, 100);
+                float infectiousThreshold, recoveredThreshold, exposedThreshold;
+                if (symptomsProbability > 1 - conf.probabilityOfSymptomatic)
+                {
+                    mean = (0.5f + 1.5f) * 60 * 24 / 2;
+                    sigma = (1.5f * 60 * 24 - mean) / 3;
+                }
+                else
+                {
+                    mean = (2 + 4) * 60 * 24 / 2;
+                    sigma = (4 * 60 * 24 - mean) / 3;
+                }
+
+                infectiousThreshold = GenerateNormalRandom(mean, sigma, 2 * 24 * 60, 4 * 24 * 60);
+
+                float humanDeathProbability = UnityEngine.Random.Range(0, 100);
+                if (humanDeathProbability <= 1 - conf.probabilityOfDeath)
+                {
+                    mean = (30 + 45) * 60 * 24 / 2;
+                    sigma = (45 * 60 * 24 - mean) / 3;
+                }
+
+                recoveredThreshold = GenerateNormalRandom(mean, sigma, 30 * 24 * 60, 45 * 24 * 60);
+
+                mean = (3 + 6) * 60 * 24 / 2;
+                sigma = (6 * 60 * 24 - mean) / 3;
+
+                exposedThreshold = GenerateNormalRandom(mean, sigma, 3 * 60 * 24, 6 * 60 * 24);
+
                 entityManager.AddComponentData(entity, new InfectionComponent{
                     infected=false,
                     status = Status.susceptible,
@@ -99,11 +165,15 @@ public class Human : MonoBehaviour{
                     exposedCounter = 0,
                     recoveredCounter = 0,
 
-                    symptomsProbability = 0,
+                    globalSymptomsProbability = conf.probabilityOfSymptomatic,
+                    globalDeathProbability = conf.probabilityOfDeath,
 
-                    infectiousThreshold = 0,
-                    exposedThreshold = 0,
-                    recoveredThreshold = 0
+                    humanSymptomsProbability = symptomsProbability,
+                    humanDeathProbability = humanDeathProbability,
+
+                    infectiousThreshold = infectiousThreshold,
+                    exposedThreshold = exposedThreshold,
+                    recoveredThreshold = recoveredThreshold
                 });
                 //graphics
                 float uvOffsetY = 0.2f;
@@ -128,5 +198,19 @@ public class Human : MonoBehaviour{
         }
 
         entityArray.Dispose();
+    }
+
+    public static float GenerateNormalRandom(float mean, float sigma, float min, float max)
+    {
+        float rand1 = UnityEngine.Random.Range(0.0f, 1.0f);
+        float rand2 = UnityEngine.Random.Range(0.0f, 1.0f);
+
+        float n = Mathf.Sqrt(-2.0f * Mathf.Log(rand1)) * Mathf.Cos((2.0f * Mathf.PI) * rand2);
+
+        float generatedNumber = (mean + sigma * n);
+
+        generatedNumber = Mathf.Clamp(generatedNumber, min, max);
+
+        return generatedNumber;
     }
 }

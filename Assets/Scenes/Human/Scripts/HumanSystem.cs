@@ -43,10 +43,10 @@ public class HumanSystem : SystemBase{
         JobHandle jobhandle = Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
 
             //increment of 1 value per second for each HumanComponent parameters
-            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 25 * 3600);
-            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 25 * 3600);
-            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 25 * 3600);
-            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 25 * 3600);
+            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 25 * 60);
+            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 25 * 60);
+            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 25 * 60);
+            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 25 * 60);
 
             //retrieve entity position
             GetXY(t.Value, Vector3.zero, cellSize, out int currentX, out int currentY); //TODO fix hardcoded origin
@@ -82,7 +82,7 @@ public class HumanSystem : SystemBase{
         JobHandle jobhandle1 = Entities.WithNone<NeedComponent>().ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc) =>{
             
             //set searchRadius for retrieving areas in the map included in that radius if the need is over a certain threshold
-            if (hc.hunger > 3600*6){
+            if (hc.hunger > 60*6){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForFood
                 });
@@ -90,7 +90,7 @@ public class HumanSystem : SystemBase{
                     searchRadius=2
                 });
             }
-            else if (hc.fatigue > 16*3600){
+            else if (hc.fatigue > 16*60){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needToRest
                 });
@@ -98,7 +98,7 @@ public class HumanSystem : SystemBase{
                     searchRadius=2
                 });
             }
-            else if (hc.sportivity > 24*3600){
+            else if (hc.sportivity > 24*60){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForSport
                 });
@@ -106,7 +106,7 @@ public class HumanSystem : SystemBase{
                     searchRadius=2
                 });
             }
-            else if (hc.sociality > 10*3600){
+            else if (hc.sociality > 10*60){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForSociality
                 });

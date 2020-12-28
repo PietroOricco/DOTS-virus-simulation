@@ -24,8 +24,11 @@ public struct InfectionComponent : IComponentData
     public float exposedCounter;
     public float recoveredCounter;
 
-    public float symptomsProbability;
-    public float deathProbability;
+    public float globalSymptomsProbability;
+    public float globalDeathProbability;
+    
+    public float humanSymptomsProbability;
+    public float humanDeathProbability;
 
     public float infectiousThreshold;
     public float exposedThreshold;
