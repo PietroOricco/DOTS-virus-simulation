@@ -61,7 +61,7 @@ public class Human : MonoBehaviour{
 
             //components depending on infection
             float uvWidth = 1f;
-            float uvHeight = 1f/2;
+            float uvHeight = 1f/5;
             float uvOffsetX = 0f;
             
             if(numberOfInfects > 0){
@@ -106,7 +106,7 @@ public class Human : MonoBehaviour{
                     recoveredThreshold = 0
                 });
                 //graphics
-                float uvOffsetY = 0.5f;
+                float uvOffsetY = 0.2f;
                 SpriteSheetAnimation_Data spriteSheetAnimationData;
                 spriteSheetAnimationData.uv = new Vector4(uvWidth, uvHeight, uvOffsetX, uvOffsetY);
                 spriteSheetAnimationData.matrix = Matrix4x4.TRS(position, Quaternion.identity, Vector3.one);
