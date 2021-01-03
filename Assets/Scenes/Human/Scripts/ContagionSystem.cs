@@ -16,7 +16,7 @@ public class ContagionSystem : SystemBase
     //copy of the grid, used to know where is each entity
     public NativeMultiHashMap<int, QuadrantData> quadrantMultiHashMap2;
 
-    private const float contagionThreshold = 900f;
+    private const float contagionThreshold = 15f;
 
     protected override void OnCreate()
     {
