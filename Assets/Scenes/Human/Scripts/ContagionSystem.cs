@@ -106,6 +106,7 @@ public class ContagionSystem : SystemBase
                 else
                 {
                     //recovery time set up
+                    Counter.infectedCounter--;
                     ic.status = Status.recovered;
                     //qe.typeEnum = QuadrantEntity.TypeEnum.recovered;
                     ic.recoveredCounter = 0;
@@ -114,7 +115,6 @@ public class ContagionSystem : SystemBase
 
             if(ic.recoveredCounter > ic.recoveredThreshold && ic.status == Status.recovered)
             {
-                Counter.infectedCounter--;
                 ic.status = Status.susceptible;
                 qe.typeEnum = QuadrantEntity.TypeEnum.susceptible;
             }
