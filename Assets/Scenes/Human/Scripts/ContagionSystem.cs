@@ -78,7 +78,7 @@ public class ContagionSystem : SystemBase
                 qe.typeEnum = QuadrantEntity.TypeEnum.infectious;
                 ic.status = Status.infectious;
 
-                if (ic.humanSymptomsProbability > (1 - ic.globalSymptomsProbability))
+                if (ic.humanSymptomsProbability > (100 - ic.globalSymptomsProbability))
                 {
                     //symptomatic -> lasts between 0.5 and 1.5 day
                     ic.symptomatic = true;
@@ -96,7 +96,7 @@ public class ContagionSystem : SystemBase
 
             if(ic.infectiousCounter > ic.infectiousThreshold && ic.status == Status.infectious)
             {
-                if(ic.humanDeathProbability > (1-ic.globalDeathProbability))
+                if(ic.humanDeathProbability > (100-ic.globalDeathProbability))
                 {
                     //remove entity
                     ic.status = Status.removed;
@@ -105,6 +105,8 @@ public class ContagionSystem : SystemBase
                 else
                 {
                     //recovery time set up
+                    ic.status = Status.recovered;
+                    //qe.typeEnum = QuadrantEntity.TypeEnum.recovered;
                     ic.recoveredCounter = 0;
                 }
             }

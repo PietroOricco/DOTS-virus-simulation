@@ -28,7 +28,8 @@ public struct QuadrantEntity : IComponentData {
         susceptible,
         exposed,
         infectious,
-        removed
+        removed,
+        recovered
     }
 }
 
