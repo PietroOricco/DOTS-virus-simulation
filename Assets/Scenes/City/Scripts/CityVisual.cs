@@ -36,29 +36,35 @@ public class CityVisual : MonoBehaviour
                 int index = i * grid.GetHeight() + j;
                 Vector3 quadsize = new Vector3(1, 1) * grid.GetCellSize();
                 TileMapSprite value = grid.GetGridObject(i, j).GetTileType();
-                Vector2 gridValueUV;
+                Vector2 gridValueUV00, gridValueUV11;
 
                 //based on type of cell, decide color
                 if (value == TileMapSprite.Road){
-                    gridValueUV = Vector2.zero;
+                    gridValueUV00 = new Vector2(1f/3f,1f/3f);
+                    gridValueUV11 = new Vector2(2f/3f,2f/3f);
                 }
                 else if (value == TileMapSprite.Park){
-                    gridValueUV = Vector2.one;
+                    gridValueUV00 = new Vector2(1f/3f, 2f/3f);
+                    gridValueUV11 = new Vector2(2f/3f, 1);
                 }
                 else if (value == TileMapSprite.Home){
-                    gridValueUV = new Vector2(0.5f,0.5f);
+                    gridValueUV00 = new Vector2(2f/3f, 0);
+                    gridValueUV11 = new Vector2(1, 1f/3f);
                 }
                 else if (value == TileMapSprite.Pub){
-                    gridValueUV = new Vector2(0.25f, 0.25f);
+                    gridValueUV00 = new Vector2(0, 2f/3f);
+                    gridValueUV11 = new Vector2(1f/3f, 1);
                 }
                 else if (value == TileMapSprite.Supermarket){
-                    gridValueUV = new Vector2(0.75f, 0.75f);
+                    gridValueUV00 = new Vector2(1f/3f, 0);
+                    gridValueUV11 = new Vector2(2f/3f, 1f/3f);
                 }
                 else{
-                    gridValueUV = Vector2.zero;
+                    gridValueUV00 = new Vector2(1f/3f, 2f/3f);
+                    gridValueUV11 = new Vector2(2f/3f, 1);
                 }
                 //set mesh created and position offset (center of the cell)
-                MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(i,j)+quadsize*0.5f, 0f, quadsize, gridValueUV, gridValueUV);
+                MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, grid.GetWorldPosition(i,j)+quadsize*0.5f, 0f, quadsize, gridValueUV00, gridValueUV11);
 
             }
         }

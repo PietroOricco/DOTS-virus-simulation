@@ -9,7 +9,7 @@ public class CameraControl : MonoBehaviour
     private float smoothSpeed = 2000.0f;
     private float minOrtho = 1f;
     private float maxOrtho = 250.0f;
-    private float defaultMoveSpeed = 15f;
+    private float defaultMoveSpeed = 20f;
 
     void Start()
     {
@@ -47,12 +47,12 @@ public class CameraControl : MonoBehaviour
             moveZ -= zoomSpeed;
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, transform.position + defaultMoveSpeed * (new Vector3(moveX, moveY, 0)), 2*defaultMoveSpeed*Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, transform.position + defaultMoveSpeed * (new Vector3(moveX, moveY, 0)), 2*defaultMoveSpeed*Time.deltaTime/Time.timeScale);
 
         targetOrtho -= moveZ;
         targetOrtho = Mathf.Clamp(targetOrtho, minOrtho, maxOrtho);
 
-        Camera.main.orthographicSize = Mathf.MoveTowards(Camera.main.orthographicSize, targetOrtho, 2*Mathf.Abs(moveZ*Time.deltaTime));
+        Camera.main.orthographicSize = Mathf.MoveTowards(Camera.main.orthographicSize, targetOrtho, 2*Mathf.Abs(moveZ*Time.deltaTime/Time.timeScale));
 
     }
 }

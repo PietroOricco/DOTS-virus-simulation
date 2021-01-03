@@ -106,6 +106,8 @@ public class ContagionSystem : SystemBase
                 else
                 {
                     //recovery time set up
+                    ic.status = Status.recovered;
+                    //qe.typeEnum = QuadrantEntity.TypeEnum.recovered;
                     ic.recoveredCounter = 0;
                 }
             }
