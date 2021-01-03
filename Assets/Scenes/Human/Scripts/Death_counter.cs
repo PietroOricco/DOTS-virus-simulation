@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class Counter_death : MonoBehaviour
+public class Death_counter : MonoBehaviour
 {
     public static int deathCounter = 0;
     public static Text counterText;
@@ -19,6 +19,6 @@ public class Counter_death : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        counterText.text = "Infected: " + deathCounter;
+        counterText.text = "Deaths: " + deathCounter;
     }
 }

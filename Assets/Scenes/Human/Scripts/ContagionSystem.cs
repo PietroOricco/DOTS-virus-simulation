@@ -99,7 +99,7 @@ public class ContagionSystem : SystemBase
                 if(ic.humanDeathProbability > (100-ic.globalDeathProbability))
                 {
                     //remove entity
-                    Counter_death.deathCounter++;
+                    Death_counter.deathCounter++;
                     ic.status = Status.removed;
                     qe.typeEnum = QuadrantEntity.TypeEnum.removed;
                 }
