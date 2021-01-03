@@ -100,6 +100,7 @@ public class ContagionSystem : SystemBase
                 {
                     //remove entity
                     Death_counter.deathCounter++;
+                    Counter.infectedCounter--;
                     ic.status = Status.removed;
                     qe.typeEnum = QuadrantEntity.TypeEnum.removed;
                 }
