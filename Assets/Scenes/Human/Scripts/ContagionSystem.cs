@@ -88,14 +88,14 @@ public class ContagionSystem : SystemBase
                 {
                     //symptomatic -> lasts between 0.5 and 1.5 day
                     ic.symptomatic = true;
-                        
+                    synthomatic_counter.synthomatic++;    
                     ic.infectiousCounter = 0;
                 }
                 else
                 {
                     //asymptomatic
                     ic.symptomatic = false;
-
+                    Asynthomatic_counter.asynthomatic++;
                     ic.infectiousCounter = 0;
                 }
             }
@@ -107,6 +107,10 @@ public class ContagionSystem : SystemBase
                     //remove entity
                     Death_counter.deathCounter++;
                     Counter.infectedCounter--;
+                    if (ic.symptomatic)
+                        synthomatic_counter.synthomatic--;
+                    else
+                        Asynthomatic_counter.asynthomatic--;
                     ic.status = Status.removed;
                     qe.typeEnum = QuadrantEntity.TypeEnum.removed;
                     ecb.DestroyEntity(nativeThreadIndex, entity);
@@ -115,6 +119,11 @@ public class ContagionSystem : SystemBase
                 {
                     //recovery time set up
                     Counter.infectedCounter--;
+                    Recovered_counter.recovered++;
+                    if (ic.symptomatic)
+                        synthomatic_counter.synthomatic--;
+                    else
+                        Asynthomatic_counter.asynthomatic--;
                     ic.status = Status.recovered;
                     //qe.typeEnum = QuadrantEntity.TypeEnum.recovered;
                     ic.recoveredCounter = 0;
