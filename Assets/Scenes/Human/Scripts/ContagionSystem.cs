@@ -107,6 +107,7 @@ public class ContagionSystem : SystemBase
                     //remove entity
                     Death_counter.deathCounter++;
                     Counter.infectedCounter--;
+                    Population_counter.population--;
                     if (ic.symptomatic)
                         synthomatic_counter.synthomatic--;
                     else
