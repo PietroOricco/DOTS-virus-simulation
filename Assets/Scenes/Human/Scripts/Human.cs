@@ -37,7 +37,7 @@ public class Human : MonoBehaviour{
         //Extract configuration from json file
         Configuration conf = Configuration.CreateFromJSON();
         int numberOfInfects = conf.numberOfInfects;
-
+        Population_counter.population = conf.numberOfHumans;
         entityArray = new NativeArray<Entity>(conf.numberOfHumans, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
