@@ -1,6 +1,6 @@
 {
    "numberOfHumans" : 100000, 
-   "numberOfInfects" : 100,
+   "numberOfInfects" : 10,
    "timeScale" : 60,
    "probabilityOfSymptomatic" : 58,
    "probabilityOfDeath" : 5
