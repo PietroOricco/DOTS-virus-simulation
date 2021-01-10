@@ -11,6 +11,7 @@ using System;
 
 
 [UpdateAfter(typeof(QuadrantSystem))]
+[UpdateAfter(typeof(PathFollowSystem))]
 public class ContagionSystem : SystemBase
 {
     //copy of the grid, used to know where is each entity
@@ -18,17 +19,22 @@ public class ContagionSystem : SystemBase
 
     private const float contagionThreshold = 15f;
 
+    EndSimulationEntityCommandBufferSystem m_EndSimulationEcbSystem;
+
     protected override void OnCreate()
     {
         quadrantMultiHashMap2 = QuadrantSystem.quadrantMultiHashMap;
+        m_EndSimulationEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     protected override void OnUpdate(){
         var quadrantMultiHashMap = quadrantMultiHashMap2;
         float deltaTime = Time.DeltaTime;
 
+        var ecb = m_EndSimulationEcbSystem.CreateCommandBuffer().ToConcurrent();
+
         //job -> each element, if not infected, check if there are infected in its same quadrant
-        Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
+        var jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
             float symptomsProbability;
             float deathProbability;
             //for non infected entities, a check in the direct neighbours is done for checking the presence of infected 
@@ -103,6 +109,7 @@ public class ContagionSystem : SystemBase
                     Counter.infectedCounter--;
                     ic.status = Status.removed;
                     qe.typeEnum = QuadrantEntity.TypeEnum.removed;
+                    ecb.DestroyEntity(nativeThreadIndex, entity);
                 }
                 else
                 {
@@ -133,7 +140,10 @@ public class ContagionSystem : SystemBase
                 ic.recoveredCounter += 1f * deltaTime;
             }
 
-        }).WithReadOnly(quadrantMultiHashMap).WithoutBurst().ScheduleParallel();
+        }).WithReadOnly(quadrantMultiHashMap).ScheduleParallel(Dependency);
+
+        m_EndSimulationEcbSystem.AddJobHandleForProducer(jobHandle);
+        this.Dependency = jobHandle;
     }
 }
 

@@ -4,7 +4,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Jobs;
 
-public class PathFollowSystem : JobComponentSystem {
+public class PathFollowSystem : SystemBase {
 
     private Unity.Mathematics.Random random;
 
@@ -12,12 +12,12 @@ public class PathFollowSystem : JobComponentSystem {
         random = new Unity.Mathematics.Random(56);
     }
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps) {
+    protected override void OnUpdate() {
         float deltaTime = Time.DeltaTime;
 
         float cellSize = Testing.Instance.grid.GetCellSize();
 
-        return Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, ref PathFollow pathFollow) => {
+        Entities.ForEach((Entity entity, DynamicBuffer<PathPosition> pathPositionBuffer, ref Translation translation, ref PathFollow pathFollow) => {
             if (pathFollow.pathIndex >= 0) {
                 // Has path to follow
                 PathPosition pathPosition = pathPositionBuffer[pathFollow.pathIndex];
@@ -33,7 +33,7 @@ public class PathFollowSystem : JobComponentSystem {
                     pathFollow.pathIndex--;
                 }
             }
-        }).Schedule(inputDeps);
+        }).ScheduleParallel();
     }
 
     private void ValidateGridPosition(ref int x, ref int y) {
