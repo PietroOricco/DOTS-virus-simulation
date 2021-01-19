@@ -45,7 +45,7 @@ public class Human : MonoBehaviour{
         for (int i = 0; i < entityArray.Length; i++){
             Entity entity = entityArray[i];
 
-            Vector3 position = new float3((UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 45 / 3)) * 30f + 10f + UnityEngine.Random.Range(0, 10f), 0);
+            Vector3 position = new float3((UnityEngine.Random.Range(0, 20)) * 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 15)) * 10f + UnityEngine.Random.Range(0, 10f), 0);
 
             entityManager.AddBuffer<PathPosition>(entity);
 
@@ -101,11 +101,12 @@ public class Human : MonoBehaviour{
 
                 entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
                     infected=true,
-                    status = Status.exposed,
+                    status = Status.infectious,
                     contagionCounter = 0,
                     infectiousCounter = 0,
                     exposedCounter = 0,
                     recoveredCounter = 0,
+                    symptomatic = true,
 
                     globalSymptomsProbability = conf.probabilityOfSymptomatic,
                     globalDeathProbability = conf.probabilityOfDeath,
@@ -118,6 +119,7 @@ public class Human : MonoBehaviour{
                     recoveredThreshold = recoveredThreshold
                 });
                 Counter.infectedCounter++;
+                synthomatic_counter.synthomatic++;
                 //graphics
                 float uvOffsetY = 0.0f;
                 SpriteSheetAnimation_Data spriteSheetAnimationData;

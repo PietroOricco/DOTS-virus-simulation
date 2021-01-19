@@ -39,9 +39,17 @@ public class CityVisual : MonoBehaviour
                 Vector2 gridValueUV00, gridValueUV11;
 
                 //based on type of cell, decide color
-                if (value == TileMapSprite.Road){
+                if (value == TileMapSprite.RoadHorizontal){
                     gridValueUV00 = new Vector2(1f/3f,1f/3f);
                     gridValueUV11 = new Vector2(2f/3f,2f/3f);
+                }
+                else if (value == TileMapSprite.RoadVertical){
+                    gridValueUV00 = new Vector2(0, 1f/3f);
+                    gridValueUV11 = new Vector2(1f/3f, 2f/3f);
+                }
+                else if (value == TileMapSprite.RoadCrossing){
+                    gridValueUV00 = new Vector2(0, 0);
+                    gridValueUV11 = new Vector2(1f/3f, 1f/3f);
                 }
                 else if (value == TileMapSprite.Park){
                     gridValueUV00 = new Vector2(1f/3f, 2f/3f);
@@ -51,6 +59,10 @@ public class CityVisual : MonoBehaviour
                     gridValueUV00 = new Vector2(2f/3f, 0);
                     gridValueUV11 = new Vector2(1, 1f/3f);
                 }
+                else if (value == TileMapSprite.Home2){
+                    gridValueUV00 = new Vector2(2f/3f, 1f/3f);
+                    gridValueUV11 = new Vector2(1, 2f/3f);
+                }
                 else if (value == TileMapSprite.Pub){
                     gridValueUV00 = new Vector2(0, 2f/3f);
                     gridValueUV11 = new Vector2(1f/3f, 1);
@@ -59,7 +71,11 @@ public class CityVisual : MonoBehaviour
                     gridValueUV00 = new Vector2(1f/3f, 0);
                     gridValueUV11 = new Vector2(2f/3f, 1f/3f);
                 }
-                else{
+                else if (value == TileMapSprite.Office){
+                    gridValueUV00 = new Vector2(2f/3f, 2f/3f);
+                    gridValueUV11 = new Vector2(1, 1);
+                }
+                else{//Park by default
                     gridValueUV00 = new Vector2(1f/3f, 2f/3f);
                     gridValueUV11 = new Vector2(2f/3f, 1);
                 }

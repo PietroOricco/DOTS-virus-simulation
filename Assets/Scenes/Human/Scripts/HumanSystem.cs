@@ -60,6 +60,9 @@ public class HumanSystem : SystemBase{
                 case TileMapEnum.TileMapSprite.Home:
                     hc.fatigue = Math.Max(0, hc.fatigue-3f* deltaTime);
                     break;
+                case TileMapEnum.TileMapSprite.Home2:
+                    hc.fatigue = Math.Max(0, hc.fatigue-3f* deltaTime);
+                    break;
                 case TileMapEnum.TileMapSprite.Park:
                     hc.sportivity = Math.Max(0, hc.sportivity-25f* deltaTime);
                     hc.sociality = Math.Max(0, hc.sociality-6f* deltaTime);
@@ -71,7 +74,13 @@ public class HumanSystem : SystemBase{
                 case TileMapEnum.TileMapSprite.Supermarket:
                     hc.hunger = Math.Max(0, hc.hunger-7f* deltaTime);
                     break;
-                case TileMapEnum.TileMapSprite.Road:
+                case TileMapEnum.TileMapSprite.RoadHorizontal:
+                    hc.sportivity = Math.Max(0, hc.sportivity-0.5f* deltaTime);
+                    break;
+                case TileMapEnum.TileMapSprite.RoadVertical:
+                    hc.sportivity = Math.Max(0, hc.sportivity-0.5f* deltaTime);
+                    break;
+                case TileMapEnum.TileMapSprite.RoadCrossing:
                     hc.sportivity = Math.Max(0, hc.sportivity-0.5f* deltaTime);
                     break;
             }

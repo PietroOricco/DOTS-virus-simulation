@@ -34,7 +34,7 @@ public class Grid<TGridObject> {
     private TGridObject[,] gridArray;
 
     //constructor with generics
-    public Grid(int width, int height, float cellSize, Vector3 originPosition, Func<TileMapSprite, Grid<TGridObject>, int, int, TGridObject> createGridObject) {
+    public Grid(int width, int height, float cellSize, Vector3 originPosition, int[,] array2Dmap, Func<TileMapSprite, Grid<TGridObject>, int, int, TGridObject> createGridObject) {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
@@ -43,34 +43,9 @@ public class Grid<TGridObject> {
         gridArray = new TGridObject[width, height];
 
         //populate the map, setting fixed roads and the other elements randomly
-        for (int x = 0; x < gridArray.GetLength(0); x++){
-            for (int y = 0; y < gridArray.GetLength(1); y++){
-                if (x % 3 == 1) gridArray[x, y] = createGridObject(TileMapSprite.Road, this, x, y);
-                else{
-                    if (y % 3 == 1)
-                        gridArray[x, y] = createGridObject(TileMapSprite.Road, this, x, y);
-                    else{
-                        // 1-> house, 2-> park, 3-> pub, 4->supermarket
-                        int random = UnityEngine.Random.Range(1, 5);
-                        switch(random){
-                            case 1:
-                                gridArray[x, y] = createGridObject(TileMapSprite.Home, this, x, y);
-                                break;
-                            case 2:
-                                gridArray[x, y] = createGridObject(TileMapSprite.Park, this, x, y);
-                                break;
-                            case 3:
-                                gridArray[x, y] = createGridObject(TileMapSprite.Pub, this, x, y);
-                                break;
-                            case 4:
-                                gridArray[x, y] = createGridObject(TileMapSprite.Supermarket, this, x, y);
-                                break;
-                            default:
-                                gridArray[x, y] = createGridObject(TileMapSprite.Road, this, x, y);
-                                break;
-                        }
-                    }
-                }
+        for (int x = 0; x < width; x++){
+            for (int y = 0; y < height; y++){
+                gridArray[x, y] = createGridObject((TileMapSprite)array2Dmap[y,x], this, x, y);
             }
         }
 
@@ -79,8 +54,8 @@ public class Grid<TGridObject> {
         if (showDebug) {
             TextMesh[,] debugTextArray = new TextMesh[width, height];
 
-            for (int x = 0; x < gridArray.GetLength(0); x++) {
-                for (int y = 0; y < gridArray.GetLength(1); y++) {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, 100f);
                     Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, 100f);
                 }

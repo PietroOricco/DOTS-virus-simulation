@@ -19,7 +19,10 @@ public class GridNode {
         this.tileType = tileType;
         this.x = x;
         this.y = y;
-        if(tileType==TileMapSprite.Road)
+        if(tileType==TileMapSprite.RoadCrossing||
+            tileType==TileMapSprite.RoadVertical||
+            tileType==TileMapSprite.RoadHorizontal||
+            tileType==TileMapSprite.Park)
             isWalkable = true;
         else isWalkable = false;
     }

@@ -76,8 +76,9 @@ public class GetNeedPathSystem : SystemBase {
 					result[0]=TileMapEnum.TileMapSprite.Park;
 					break;
 				case NeedType.needToRest:
-					result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+					result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
 					result[0]=TileMapEnum.TileMapSprite.Home;
+					result[1]=TileMapEnum.TileMapSprite.Home2;
 					break;	
 			}
 
@@ -151,8 +152,9 @@ public class GetNeedPathSystem : SystemBase {
 				result[0]=TileMapEnum.TileMapSprite.Park;
 				return result;
 			case NeedType.needToRest:
-				result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+				result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
 				result[0]=TileMapEnum.TileMapSprite.Home;
+				result[1]=TileMapEnum.TileMapSprite.Home2;
 				return result;
 			default:
 				return new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
