@@ -21,7 +21,9 @@ public class Testing : MonoBehaviour{
     private void Start()
     {
         XmlDocument mapDocument = new XmlDocument();
-        mapDocument.Load(@"./Conf/map.tmx");
+        var mapFileName = Configuration.CreateFromJSON().map;
+
+        mapDocument.Load(@"./Conf/Maps/"+mapFileName);
 
         // Select a single node
         XmlNode mapNode = mapDocument.SelectSingleNode("map");

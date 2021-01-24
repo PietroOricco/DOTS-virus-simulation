@@ -9,6 +9,7 @@ public class Configuration
     public float timeScale;
     public float probabilityOfSymptomatic;
     public float probabilityOfDeath;
+    public string map;
 
     public static Configuration CreateFromJSON()
     {

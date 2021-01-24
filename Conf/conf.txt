@@ -3,5 +3,6 @@
    "numberOfInfects" : 10,
    "timeScale" : 60,
    "probabilityOfSymptomatic" : 58,
-   "probabilityOfDeath" : 5
+   "probabilityOfDeath" : 5,
+"map": "map.tmx"
 }
