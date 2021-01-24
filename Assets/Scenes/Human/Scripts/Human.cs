@@ -41,11 +41,15 @@ public class Human : MonoBehaviour{
         entityArray = new NativeArray<Entity>(conf.numberOfHumans, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
+        // Get grid size
+        int gridWidth = Testing.Instance.grid.GetWidth();
+        int gridHeight = Testing.Instance.grid.GetHeight();
+
         //TODO model social responsibility
         for (int i = 0; i < entityArray.Length; i++){
             Entity entity = entityArray[i];
 
-            Vector3 position = new float3((UnityEngine.Random.Range(0, 20)) * 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, 15)) * 10f + UnityEngine.Random.Range(0, 10f), 0);
+            Vector3 position = new float3((UnityEngine.Random.Range(0, gridWidth)) * 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, gridHeight)) * 10f + UnityEngine.Random.Range(0, 10f), 0);
 
             entityManager.AddBuffer<PathPosition>(entity);
 
