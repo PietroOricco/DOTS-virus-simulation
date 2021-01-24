@@ -34,7 +34,7 @@ public class GetNeedPathSystem : SystemBase {
 		directions.CopyFrom(new int2[] {new int2(1, 0), new int2(0, -1), new int2(-1, 0), new int2(0, 1)});
 		start_offset = new NativeArray<int2>(4, Allocator.Persistent);
 		start_offset.CopyFrom(new int2[] {new int2(-1, 1), new int2(1, 1), new int2(1, -1), new int2(-1, -1)});
-		rnd = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(0,420));
+		rnd = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(1,420));
     }
 
 	protected override void OnUpdate() {
