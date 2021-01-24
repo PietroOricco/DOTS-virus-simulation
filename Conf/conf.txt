@@ -4,5 +4,11 @@
    "timeScale" : 60,
    "probabilityOfSymptomatic" : 58,
    "probabilityOfDeath" : 5,
+   "minDaysInfectious": 2,
+   "maxDaysInfectious": 4,
+   "minDaysRecovered": 30,
+   "maxDaysRecovered": 45,
+   "minDaysExposed": 3,
+   "maxDaysExposed": 6,
    "map": "large.tmx"
 }
