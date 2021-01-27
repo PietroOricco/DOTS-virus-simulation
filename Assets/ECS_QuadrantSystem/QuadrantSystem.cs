@@ -99,7 +99,7 @@ public class QuadrantSystem : SystemBase {
         
         NativeMultiHashMap<int, QuadrantData>.ParallelWriter quadrantMultiHashMap2 = quadrantMultiHashMap.AsParallelWriter(); //TODO smells
 
-        JobHandle jobHandle = Entities.ForEach((Entity entity, Translation t, ref QuadrantEntity qe, in InfectionComponent ic) =>{
+        Entities.ForEach((Entity entity, Translation t, ref QuadrantEntity qe, in InfectionComponent ic) =>{
             if(ic.infected){   
                 int hashMapKey = GetPositionHashMapKey(t.Value);
                 //Debug.Log(hashMapKey);
@@ -109,9 +109,7 @@ public class QuadrantSystem : SystemBase {
                     quadrantEntity = qe
                 });
             }
-        }).ScheduleParallel(Dependency);
-        jobHandle.Complete();
-        //Debug.Log(GetEntityCountInHashMap(quadrantMultiHashMap, GetPositionHashMapKey(new float3(0f,0f,0))));
+        }).ScheduleParallel();
     }
 
 }

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Threading;
 
 public class Counter : MonoBehaviour
 {
-
     public static int infectedCounter=0;
     public static Text counterText;
     // Start is called before the first frame update
@@ -14,11 +14,9 @@ public class Counter : MonoBehaviour
         counterText = GetComponent<Text>();
     }
 
-   
-
     // Update is called once per frame
     void Update()
     {
-         counterText.text = "Exposed: " + infectedCounter;
+         counterText.text = "Exposed: " + Interlocked.Read(ref ContagionSystem.infectedCounter);
     }
 }

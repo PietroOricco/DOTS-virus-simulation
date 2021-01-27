@@ -1,14 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Jobs;
-using JetBrains.Annotations;
-using System;
-
+using System.Threading;
+using UnityEngine;
+using Unity.Collections.LowLevel.Unsafe;
 
 [UpdateAfter(typeof(QuadrantSystem))]
 [UpdateAfter(typeof(PathFollowSystem))]
@@ -21,10 +18,13 @@ public class ContagionSystem : SystemBase
 
     EndSimulationEntityCommandBufferSystem m_EndSimulationEcbSystem;
 
+    public static long infectedCounter = 0;
+
     protected override void OnCreate()
     {
         quadrantMultiHashMap2 = QuadrantSystem.quadrantMultiHashMap;
         m_EndSimulationEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+        infectedCounter = 0;
     }
 
     protected override void OnUpdate(){
@@ -33,10 +33,17 @@ public class ContagionSystem : SystemBase
 
         var ecb = m_EndSimulationEcbSystem.CreateCommandBuffer().ToConcurrent();
 
+        NativeArray<long> localInfectedCounter = new NativeArray<long>(1, Allocator.TempJob);
+        localInfectedCounter[0]=0;
+
+        int localSynthomaticCounter = synthomatic_counter.synthomatic;
+        int localAsynthomaticCounter = Asynthomatic_counter.asynthomatic;
+        int localDeathCounter = Death_counter.deathCounter;
+        int localPopulationCounter = Population_counter.population;
+        int localRecoveredCounter = Recovered_counter.recovered;
+
         //job -> each element, if not infected, check if there are infected in its same quadrant
         var jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
-            float symptomsProbability;
-            float deathProbability;
             //for non infected entities, a check in the direct neighbours is done for checking the presence of infected 
             if (ic.status == Status.susceptible)
             {
@@ -71,7 +78,9 @@ public class ContagionSystem : SystemBase
             if (ic.contagionCounter >= contagionThreshold && ic.status == Status.susceptible)
             {
                 //human become infected
-                Counter.infectedCounter++;
+                unsafe{
+                    Interlocked.Increment(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]);
+                }
                 qe.typeEnum = QuadrantEntity.TypeEnum.exposed;
                 ic.status = Status.exposed;
                    
@@ -88,14 +97,14 @@ public class ContagionSystem : SystemBase
                 {
                     //symptomatic -> lasts between 0.5 and 1.5 day
                     ic.symptomatic = true;
-                    synthomatic_counter.synthomatic++;    
+                    Interlocked.Increment(ref localSynthomaticCounter);    
                     ic.infectiousCounter = 0;
                 }
                 else
                 {
                     //asymptomatic
                     ic.symptomatic = false;
-                    Asynthomatic_counter.asynthomatic++;
+                    Interlocked.Increment(ref localAsynthomaticCounter);
                     ic.infectiousCounter = 0;
                 }
             }
@@ -105,13 +114,15 @@ public class ContagionSystem : SystemBase
                 if(ic.humanDeathProbability > (100-ic.globalDeathProbability))
                 {
                     //remove entity
-                    Death_counter.deathCounter++;
-                    Counter.infectedCounter--;
-                    Population_counter.population--;
+                    Interlocked.Increment(ref localDeathCounter);
+                    unsafe{
+                        Interlocked.Decrement(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]);
+                    }
+                    Interlocked.Decrement(ref localPopulationCounter);
                     if (ic.symptomatic)
-                        synthomatic_counter.synthomatic--;
+                        Interlocked.Decrement(ref localSynthomaticCounter);
                     else
-                        Asynthomatic_counter.asynthomatic--;
+                        Interlocked.Decrement(ref localAsynthomaticCounter);
                     ic.status = Status.removed;
                     qe.typeEnum = QuadrantEntity.TypeEnum.removed;
                     ecb.DestroyEntity(nativeThreadIndex, entity);
@@ -119,12 +130,14 @@ public class ContagionSystem : SystemBase
                 else
                 {
                     //recovery time set up
-                    Counter.infectedCounter--;
-                    Recovered_counter.recovered++;
+                    unsafe{
+                        Interlocked.Decrement(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]);
+                    }
+                    Interlocked.Increment(ref localRecoveredCounter);
                     if (ic.symptomatic)
-                        synthomatic_counter.synthomatic--;
+                        Interlocked.Decrement(ref localSynthomaticCounter);
                     else
-                        Asynthomatic_counter.asynthomatic--;
+                        Interlocked.Decrement(ref localAsynthomaticCounter);
                     ic.status = Status.recovered;
                     //qe.typeEnum = QuadrantEntity.TypeEnum.recovered;
                     ic.recoveredCounter = 0;
@@ -154,6 +167,18 @@ public class ContagionSystem : SystemBase
 
         m_EndSimulationEcbSystem.AddJobHandleForProducer(jobHandle);
         this.Dependency = jobHandle;
+
+        jobHandle.Complete();
+        
+        unsafe{
+            Interlocked.Add(ref infectedCounter, Interlocked.Read(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]));
+        }
+        
+        synthomatic_counter.synthomatic = localSynthomaticCounter;
+        Asynthomatic_counter.asynthomatic = localAsynthomaticCounter;
+        Death_counter.deathCounter = localDeathCounter;
+        Population_counter.population = localPopulationCounter;
+        Recovered_counter.recovered = localRecoveredCounter;
     }
 }
 

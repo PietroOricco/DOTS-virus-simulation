@@ -1,8 +1,8 @@
 {
-   "numberOfHumans" : 30000, 
-   "numberOfInfects" : 10,
-   "timeScale" : 60,
+   "numberOfHumans" : 100000, 
+   "numberOfInfects" : 20,
+   "timeScale" : 30,
    "probabilityOfSymptomatic" : 58,
    "probabilityOfDeath" : 5,
-   "map": "large.tmx"
+   "map": "extralarge.tmx"
 }

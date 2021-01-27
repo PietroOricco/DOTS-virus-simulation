@@ -45,11 +45,25 @@ public class Human : MonoBehaviour{
         int gridWidth = Testing.Instance.grid.GetWidth();
         int gridHeight = Testing.Instance.grid.GetHeight();
 
+        // Get houses
+        List<Vector2Int> houses = new List<Vector2Int>();
+        var mapGrid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
+        for(int i = 0; i < gridWidth; i++){
+            for(int j = 0; j < gridHeight; j++){
+                if(mapGrid[i+j*gridWidth]==TileMapEnum.TileMapSprite.Home||mapGrid[i+j*gridWidth]==TileMapEnum.TileMapSprite.Home2){
+                    houses.Add(new Vector2Int(i, j));
+                }
+            }
+        }
+
+        int peoplePerHouse = Mathf.CeilToInt((float)entityArray.Length/(float)houses.Count);
+
         //TODO model social responsibility
         for (int i = 0; i < entityArray.Length; i++){
             Entity entity = entityArray[i];
 
-            Vector3 position = new float3((UnityEngine.Random.Range(0, gridWidth)) * 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, gridHeight)) * 10f + UnityEngine.Random.Range(0, 10f), 0);
+            //Vector3 position = new float3((UnityEngine.Random.Range(0, gridWidth)) * 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, gridHeight)) * 10f + UnityEngine.Random.Range(0, 10f), 0);
+            Vector3 position = new float3(houses[i/peoplePerHouse].x * 10f + UnityEngine.Random.Range(0, 10f), houses[i/peoplePerHouse].y * 10f + UnityEngine.Random.Range(0, 10f), 0);
 
             entityManager.AddBuffer<PathPosition>(entity);
 
@@ -61,6 +75,7 @@ public class Human : MonoBehaviour{
                 sociality = UnityEngine.Random.Range(0, 10 * 60),
                 fatigue = UnityEngine.Random.Range(0, 10 * 60),
                 socialResposibility = UnityEngine.Random.Range(0, 100f) / 100f,
+                homePosition = houses[i/peoplePerHouse],
             }) ;
 
             //Time Scale

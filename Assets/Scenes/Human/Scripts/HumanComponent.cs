@@ -12,4 +12,6 @@ public struct HumanComponent : IComponentData
     public float fatigue;       //home
     // social behavior
     public float socialResposibility;
+    //home
+    public Vector2Int homePosition;
 }
