@@ -91,32 +91,32 @@ public class Human : MonoBehaviour{
 
                 float symptomsProbability = UnityEngine.Random.Range(0, 100);
                 float infectiousThreshold, recoveredThreshold, exposedThreshold;
-                if(symptomsProbability > 1 - conf.probabilityOfSymptomatic)
+                if (symptomsProbability > 1 - conf.probabilityOfSymptomatic)
                 {
                     mean = (0.5f + 1.5f) * 60 * 24 / 2;
                     sigma = (1.5f * 60 * 24 - mean) / 3;
                 }
                 else
                 {
-                    mean = (2 + 4) * 60 * 24 / 2;
-                    sigma = (4 * 60 * 24 - mean) / 3;
+                    mean = (conf.minDaysInfectious + conf.maxDaysInfectious) * 60 * 24 / 2;
+                    sigma = (conf.maxDaysInfectious * 60 * 24 - mean) / 3;
                 }
 
-                infectiousThreshold = GenerateNormalRandom(mean, sigma, 2 * 24 * 60, 4 * 24 * 60);
+                infectiousThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysInfectious * 24 * 60, conf.maxDaysInfectious * 24 * 60);
 
                 float humanDeathProbability = UnityEngine.Random.Range(0, 100);
                 if (humanDeathProbability <= 1 - conf.probabilityOfDeath)
                 {
-                    mean = (30 + 45) * 60 * 24 / 2;
-                    sigma = (45 * 60 * 24 - mean) / 3;
+                    mean = (conf.minDaysRecovered + conf.maxDaysRecovered) * 60 * 24 / 2;
+                    sigma = (conf.maxDaysRecovered * 60 * 24 - mean) / 3;
                 }
 
-                recoveredThreshold = GenerateNormalRandom(mean, sigma, 30 * 24 * 60, 45 * 24 * 60);
+                recoveredThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysRecovered * 24 * 60, conf.maxDaysRecovered * 24 * 60);
 
-                mean = (3 + 6) * 60 * 24 / 2;
-                sigma = (6 * 60 * 24 - mean) / 3;
+                mean = (conf.minDaysExposed + conf.maxDaysExposed) * 60 * 24 / 2;
+                sigma = (conf.maxDaysExposed * 60 * 24 - mean) / 3;
 
-                exposedThreshold = GenerateNormalRandom(mean, sigma, 3 * 60 * 24, 6 * 60 * 24);
+                exposedThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysExposed * 60 * 24, conf.maxDaysExposed * 60 * 24);
 
                 entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
                     infected=true,
@@ -158,25 +158,25 @@ public class Human : MonoBehaviour{
                 }
                 else
                 {
-                    mean = (2 + 4) * 60 * 24 / 2;
-                    sigma = (4 * 60 * 24 - mean) / 3;
+                    mean = (conf.minDaysInfectious + conf.maxDaysInfectious) * 60 * 24 / 2;
+                    sigma = (conf.maxDaysInfectious * 60 * 24 - mean) / 3;
                 }
 
-                infectiousThreshold = GenerateNormalRandom(mean, sigma, 2 * 24 * 60, 4 * 24 * 60);
+                infectiousThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysInfectious * 24 * 60, conf.maxDaysInfectious * 24 * 60);
 
                 float humanDeathProbability = UnityEngine.Random.Range(0, 100);
                 if (humanDeathProbability <= 1 - conf.probabilityOfDeath)
                 {
-                    mean = (30 + 45) * 60 * 24 / 2;
-                    sigma = (45 * 60 * 24 - mean) / 3;
+                    mean = (conf.minDaysRecovered + conf.maxDaysRecovered) * 60 * 24 / 2;
+                    sigma = (conf.maxDaysRecovered * 60 * 24 - mean) / 3;
                 }
 
-                recoveredThreshold = GenerateNormalRandom(mean, sigma, 30 * 24 * 60, 45 * 24 * 60);
+                recoveredThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysRecovered * 24 * 60, conf.maxDaysRecovered * 24 * 60);
 
-                mean = (3 + 6) * 60 * 24 / 2;
-                sigma = (6 * 60 * 24 - mean) / 3;
+                mean = (conf.minDaysExposed + conf.maxDaysExposed) * 60 * 24 / 2;
+                sigma = (conf.maxDaysExposed * 60 * 24 - mean) / 3;
 
-                exposedThreshold = GenerateNormalRandom(mean, sigma, 3 * 60 * 24, 6 * 60 * 24);
+                exposedThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysExposed * 60 * 24, conf.maxDaysExposed * 60 * 24);
 
                 entityManager.AddComponentData(entity, new InfectionComponent{
                     infected=false,

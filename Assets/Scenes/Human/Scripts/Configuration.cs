@@ -10,6 +10,12 @@ public class Configuration
     public float probabilityOfSymptomatic;
     public float probabilityOfDeath;
     public string map;
+    public float minDaysInfectious;
+    public float maxDaysInfectious;
+    public float minDaysRecovered;
+    public float maxDaysRecovered;
+    public float minDaysExposed;
+    public float maxDaysExposed;
 
     public static Configuration CreateFromJSON()
     {

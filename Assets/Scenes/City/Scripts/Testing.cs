@@ -21,7 +21,8 @@ public class Testing : MonoBehaviour{
     private void Start()
     {
         XmlDocument mapDocument = new XmlDocument();
-        var mapFileName = Configuration.CreateFromJSON().map;
+        Configuration conf = Configuration.CreateFromJSON();
+        var mapFileName = conf.map;
 
         mapDocument.Load(@"./Conf/Maps/"+mapFileName);
 
