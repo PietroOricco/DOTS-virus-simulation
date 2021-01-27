@@ -6,9 +6,11 @@ using Unity.Jobs;
 using System.Threading;
 using UnityEngine;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.Burst;
 
 [UpdateAfter(typeof(QuadrantSystem))]
 [UpdateAfter(typeof(PathFollowSystem))]
+[BurstCompile]
 public class ContagionSystem : SystemBase
 {
     //copy of the grid, used to know where is each entity
@@ -36,6 +38,7 @@ public class ContagionSystem : SystemBase
         NativeArray<long> localInfectedCounter = new NativeArray<long>(1, Allocator.TempJob);
         localInfectedCounter[0]=0;
 
+        // TODO remove
         int localSynthomaticCounter = synthomatic_counter.synthomatic;
         int localAsynthomaticCounter = Asynthomatic_counter.asynthomatic;
         int localDeathCounter = Death_counter.deathCounter;
@@ -174,11 +177,15 @@ public class ContagionSystem : SystemBase
             Interlocked.Add(ref infectedCounter, Interlocked.Read(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]));
         }
         
+        // TODO remove
         synthomatic_counter.synthomatic = localSynthomaticCounter;
         Asynthomatic_counter.asynthomatic = localAsynthomaticCounter;
         Death_counter.deathCounter = localDeathCounter;
         Population_counter.population = localPopulationCounter;
         Recovered_counter.recovered = localRecoveredCounter;
+        // end TODO remove
+
+        localInfectedCounter.Dispose();
     }
 }
 

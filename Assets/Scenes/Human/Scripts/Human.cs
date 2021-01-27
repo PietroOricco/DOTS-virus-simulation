@@ -219,6 +219,7 @@ public class Human : MonoBehaviour{
         }
 
         entityArray.Dispose();
+        mapGrid.Dispose();
     }
 
     public static float GenerateNormalRandom(float mean, float sigma, float min, float max)

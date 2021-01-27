@@ -132,6 +132,8 @@ public class GetNeedPathSystem : SystemBase {
 
 	protected override void OnStopRunning(){
         Grid.Dispose();
+		directions.Dispose();
+		start_offset.Dispose();
     }
 
 	private NativeArray<TileMapEnum.TileMapSprite> GetPlacesForStatus(NeedType currentNeed){
