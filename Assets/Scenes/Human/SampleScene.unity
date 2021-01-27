@@ -779,7 +779,7 @@ GameObject:
   - component: {fileID: 1662927655}
   - component: {fileID: 1662927654}
   m_Layer: 5
-  m_Name: Text_exposed
+  m_Name: Text_Exposed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
