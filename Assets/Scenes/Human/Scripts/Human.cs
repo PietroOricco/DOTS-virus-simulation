@@ -11,6 +11,7 @@ using Unity.Mathematics;
 public class Human : MonoBehaviour{
     public static Human Instance { private set; get; }
     NativeArray<Entity> entityArray;
+    public static Configuration conf;
 
     [SerializeField] public Mesh mesh;
     [SerializeField] public Material healthyMaterial;
@@ -35,9 +36,9 @@ public class Human : MonoBehaviour{
         );
 
         //Extract configuration from json file
-        Configuration conf = Configuration.CreateFromJSON();
+        conf = Configuration.CreateFromJSON();
         int numberOfInfects = conf.numberOfInfects;
-        Population_counter.population = conf.numberOfHumans;
+        //Population_counter.population = conf.numberOfHumans;
         entityArray = new NativeArray<Entity>(conf.numberOfHumans, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
@@ -137,8 +138,8 @@ public class Human : MonoBehaviour{
                     exposedThreshold = exposedThreshold,
                     recoveredThreshold = recoveredThreshold
                 });
-                Counter.infectedCounter++;
-                synthomatic_counter.synthomatic++;
+                Counter.initialInfectedCounter++;
+                synthomatic_counter.initialSymptomaticCounter++;
                 //graphics
                 float uvOffsetY = 0.0f;
                 SpriteSheetAnimation_Data spriteSheetAnimationData;

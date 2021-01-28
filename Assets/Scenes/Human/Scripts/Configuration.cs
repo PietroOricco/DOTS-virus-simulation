@@ -20,7 +20,7 @@ public class Configuration
     public static Configuration CreateFromJSON()
     {
         string text = File.ReadAllText("./Conf/conf.txt");
-        Debug.Log(text);
+        //Debug.Log(text);
         return JsonUtility.FromJson<Configuration>(text);
     }
 }

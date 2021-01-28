@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +19,7 @@ public class Asynthomatic_counter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        counterText.text = "Asynthomatic: " + asynthomatic;
+        counterText.text = "Asynthomatic: " + Interlocked.Read(ref ContagionSystem.asymptomaticCounter); ;
 
     }
 }

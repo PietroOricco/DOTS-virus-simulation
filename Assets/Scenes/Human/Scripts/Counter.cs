@@ -6,7 +6,7 @@ using System.Threading;
 
 public class Counter : MonoBehaviour
 {
-    public static int infectedCounter=0;
+    public static int initialInfectedCounter=0;
     public static Text counterText;
     // Start is called before the first frame update
     void Start()
@@ -17,6 +17,6 @@ public class Counter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-         counterText.text = "Exposed: " + Interlocked.Read(ref ContagionSystem.infectedCounter);
+        counterText.text = "Exposed: " + Interlocked.Read(ref ContagionSystem.infectedCounter);
     }
 }
