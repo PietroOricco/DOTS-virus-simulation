@@ -7,6 +7,7 @@ using UnityEditor;
 using Unity.Jobs;
 using Unity.Collections;
 
+[UpdateAfter(typeof(ContagionSystem))]
 [UpdateAfter(typeof(PathFollowSystem))]
 public class GetNeedPathSystem : SystemBase {
 
