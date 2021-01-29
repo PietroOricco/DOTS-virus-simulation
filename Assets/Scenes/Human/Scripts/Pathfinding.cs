@@ -62,7 +62,7 @@ public class Pathfinding : ComponentSystem {
                 pathfindingParamsComponentDataFromEntity = GetComponentDataFromEntity<PathfindingParams>(),
                 pathFollowComponentDataFromEntity = GetComponentDataFromEntity<PathFollow>(),
                 pathPositionBufferFromEntity = GetBufferFromEntity<PathPosition>(),
-            }.Run();
+            }.Run();//Schedule();//TODO Changed to Schedule, don't know if that will work
         }
 
         pathNodeArray.Dispose();

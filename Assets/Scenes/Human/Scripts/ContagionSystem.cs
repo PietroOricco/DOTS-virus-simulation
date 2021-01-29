@@ -9,7 +9,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Burst;
 
 [UpdateAfter(typeof(QuadrantSystem))]
-[UpdateAfter(typeof(PathFollowSystem))]
+//[UpdateAfter(typeof(PathFollowSystem))]
 [BurstCompile]
 public class ContagionSystem : SystemBase
 {
@@ -20,7 +20,7 @@ public class ContagionSystem : SystemBase
 
     Configuration conf;
 
-    EndSimulationEntityCommandBufferSystem m_EndSimulationEcbSystem;
+    EndInitializationEntityCommandBufferSystem m_EndSimulationEcbSystem;
 
     public static long infectedCounter;
     public static long symptomaticCounter;
@@ -33,7 +33,7 @@ public class ContagionSystem : SystemBase
     {
         conf = Configuration.CreateFromJSON();
         quadrantMultiHashMap2 = QuadrantSystem.quadrantMultiHashMap;
-        m_EndSimulationEcbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+        m_EndSimulationEcbSystem = World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
         infectedCounter = conf.numberOfInfects;
         symptomaticCounter = conf.numberOfInfects;
         asymptomaticCounter = 0;

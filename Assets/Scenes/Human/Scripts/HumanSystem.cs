@@ -8,8 +8,7 @@ using System;
 using Unity.Mathematics;
 using Unity.Collections;
 
-
-
+[UpdateAfter(typeof(ContagionSystem))] 
 public class HumanSystem : SystemBase{
     private EndSimulationEntityCommandBufferSystem ecbSystem;
 
@@ -30,7 +29,7 @@ public class HumanSystem : SystemBase{
         Width = Testing.Instance.grid.GetWidth();
     }
 
-    //Handles increment and decrement of parameters of HumanComponent
+    //Handles increment and decrement of parameters of HumanComponent   
     protected override void OnUpdate(){
         var ecb = ecbSystem.CreateCommandBuffer().ToConcurrent();
 
