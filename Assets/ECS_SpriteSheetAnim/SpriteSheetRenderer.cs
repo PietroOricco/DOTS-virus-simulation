@@ -20,6 +20,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Transforms;
 using Unity.Mathematics;
+using System.Diagnostics;
 
 [UpdateAfter(typeof(PlagueSystem))]
 //[DisableAutoCreation]
@@ -153,7 +154,9 @@ public class SpriteSheetRenderer : ComponentSystem {
         public NativeArray<RenderData> sortArray;
 
         public void Execute() {
-            sortArray.Sort(comparer);
+            //UnityEngine.Debug.Log(sortArray.Length.ToString());
+            if(sortArray.Length > 1)
+                sortArray.Sort(comparer);
         }
     }
 
