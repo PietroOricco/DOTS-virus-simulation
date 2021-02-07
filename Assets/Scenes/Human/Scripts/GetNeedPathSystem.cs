@@ -21,6 +21,7 @@ public class GetNeedPathSystem : SystemBase {
 	private Unity.Mathematics.Random rnd;
 
 	private EndSimulationEntityCommandBufferSystem ecbSystem;
+	private NativeArray<Vector2Int> myHouses;
  
     protected override void OnCreate(){
         ecbSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
@@ -36,6 +37,7 @@ public class GetNeedPathSystem : SystemBase {
 		start_offset = new NativeArray<int2>(4, Allocator.Persistent);
 		start_offset.CopyFrom(new int2[] {new int2(-1, 1), new int2(1, 1), new int2(1, -1), new int2(-1, -1)});
 		rnd = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(1,420));
+		myHouses = Human.Instance.houses;
     }
 
 	protected override void OnUpdate() {
@@ -48,8 +50,10 @@ public class GetNeedPathSystem : SystemBase {
 		var rnd = this.rnd;
 		var start_offset = this.start_offset;
 		var directions = this.directions;
+
+		var houses = myHouses;
 		
-        JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, ref NeedPathParams needPathParams, in Translation translation, in NeedComponent needComponent) => {
+        JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, ref NeedPathParams needPathParams, in Translation translation, in NeedComponent needComponent, in HumanComponent humanComponent) => {
 
 			GetXY(translation.Value, Vector3.zero, cellSize, out int startX, out int startY);
 
@@ -68,22 +72,36 @@ public class GetNeedPathSystem : SystemBase {
 					result[1]=TileMapEnum.TileMapSprite.Pub;
 					break;
 				case NeedType.needForSociality:
-					result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
-					result[0]=TileMapEnum.TileMapSprite.Park;
-					result[1]=TileMapEnum.TileMapSprite.Pub;
+					if(rnd.NextDouble()<0.20){
+						result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
+						found = true;
+						int friendIndex;
+						do{
+							friendIndex = rnd.NextInt(0, houses.Length);
+						}while(houses[friendIndex].x==humanComponent.homePosition.x||houses[friendIndex].y==humanComponent.homePosition.y);
+						endX = houses[friendIndex].x;
+						endY = houses[friendIndex].y;
+					}
+					else{
+						result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
+						result[0]=TileMapEnum.TileMapSprite.Park;
+						result[1]=TileMapEnum.TileMapSprite.Pub;
+					}
+
 					break;
 				case NeedType.needForSport:
 					result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
 					result[0]=TileMapEnum.TileMapSprite.Park;
 					break;
 				case NeedType.needToRest:
-					result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
-					result[0]=TileMapEnum.TileMapSprite.Home;
-					result[1]=TileMapEnum.TileMapSprite.Home2;
+					result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
+					found = true;
+					endX = humanComponent.homePosition.x;
+					endY = humanComponent.homePosition.y;
 					break;	
 			}
 
-			for(int l=0; l < result.Length; l++){
+			for(int l=0; l < result.Length && !found; l++){
 				if (result[l]==grid[startX + startY * width]){
 					endX = startX;
 					endY = startY;
@@ -124,7 +142,7 @@ public class GetNeedPathSystem : SystemBase {
 				startPosition = new int2(startX, startY),
 				endPosition = new int2(endX, endY)
 			});
-	    }).Schedule(Dependency);
+	    }).WithReadOnly(houses).ScheduleParallel(Dependency);
 
         jobHandle.Complete();
 

@@ -57,10 +57,11 @@ public class HumanSystem : SystemBase{
             //road -> decrement sportivity
             switch (grid[currentX+currentY*width]){
                 case TileMapEnum.TileMapSprite.Home:
-                    hc.fatigue = Math.Max(0, hc.fatigue-3f* deltaTime);
-                    break;
                 case TileMapEnum.TileMapSprite.Home2:
-                    hc.fatigue = Math.Max(0, hc.fatigue-3f* deltaTime);
+                    if(hc.homePosition.x==currentX&&hc.homePosition.y==currentY)
+                        hc.fatigue = Math.Max(0, hc.fatigue-3f* deltaTime);
+                    else
+                        hc.sociality = Math.Max(0, hc.sociality-6f* deltaTime);
                     break;
                 case TileMapEnum.TileMapSprite.Park:
                     hc.sportivity = Math.Max(0, hc.sportivity-25f* deltaTime);
@@ -74,11 +75,7 @@ public class HumanSystem : SystemBase{
                     hc.hunger = Math.Max(0, hc.hunger-7f* deltaTime);
                     break;
                 case TileMapEnum.TileMapSprite.RoadHorizontal:
-                    hc.sportivity = Math.Max(0, hc.sportivity-0.5f* deltaTime);
-                    break;
                 case TileMapEnum.TileMapSprite.RoadVertical:
-                    hc.sportivity = Math.Max(0, hc.sportivity-0.5f* deltaTime);
-                    break;
                 case TileMapEnum.TileMapSprite.RoadCrossing:
                     hc.sportivity = Math.Max(0, hc.sportivity-0.5f* deltaTime);
                     break;

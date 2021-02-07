@@ -37,8 +37,10 @@ public class SpriteSheetRenderer : ComponentSystem {
         public int Compare(RenderData a, RenderData b) {
             if (a.position.y < b.position.y)
                 return 1;
-            else
+            else if(a.position.y > b.position.y)
                 return -1;
+            else
+                return 0;
         }
     }
 

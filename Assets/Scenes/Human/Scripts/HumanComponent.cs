@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
+using Unity.Collections;
 
 public struct HumanComponent : IComponentData
 {
