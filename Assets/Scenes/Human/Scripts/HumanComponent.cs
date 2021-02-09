@@ -11,7 +11,6 @@ public struct HumanComponent : IComponentData
     public float sportivity;     
     public float sociality;     
     public float fatigue;
-
     public float grocery;
     public float work;
     // social behavior

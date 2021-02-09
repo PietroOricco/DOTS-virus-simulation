@@ -33,12 +33,16 @@ public class Human : MonoBehaviour{
             typeof(MoveSpeedComponent),
             typeof(PathFollow),
             typeof(QuadrantEntity),
-            typeof(SpriteSheetAnimation_Data)
+            typeof(SpriteSheetAnimation_Data),
+            typeof(InfectionComponent)
         );
 
         //Extract configuration from json file
         conf = Configuration.CreateFromJSON();
         int numberOfInfects = conf.numberOfInfects;
+
+        //Time Scale
+        Time.timeScale = conf.timeScale;
         //Population_counter.population = conf.numberOfHumans;
         entityArray = new NativeArray<Entity>(conf.numberOfHumans, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
@@ -47,27 +51,28 @@ public class Human : MonoBehaviour{
         int gridWidth = Testing.Instance.grid.GetWidth();
         int gridHeight = Testing.Instance.grid.GetHeight();
 
-        // Get houses
+        // Get houses and offices from grid
         List<Vector2Int> housesList = new List<Vector2Int>();
+        List<Vector2Int> officesList = new List<Vector2Int>();
         var mapGrid = Testing.Instance.grid.GetGridByValue((GridNode gn)=>{return gn.GetTileType();});
         for(int i = 0; i < gridWidth; i++){
             for(int j = 0; j < gridHeight; j++){
                 if(mapGrid[i+j*gridWidth]==TileMapEnum.TileMapSprite.Home||mapGrid[i+j*gridWidth]==TileMapEnum.TileMapSprite.Home2){
                     housesList.Add(new Vector2Int(i, j));
                 }
+                else if(mapGrid[i+j*gridWidth]==TileMapEnum.TileMapSprite.Office){
+                    officesList.Add(new Vector2Int(i, j));
+                }
             }
         }
         houses = housesList.ToNativeArray<Vector2Int>(Allocator.Persistent);
+        NativeArray<Vector2Int> offices = officesList.ToNativeArray<Vector2Int>(Allocator.Temp);
 
         //TODO model social responsibility
         for (int i = 0; i < entityArray.Length; i++){
             Entity entity = entityArray[i];
             var homePosition = houses[UnityEngine.Random.Range(0, houses.Length)];
-
-            var friendPositions = new List<Vector2Int>();
-            for(int h=0; h<UnityEngine.Random.Range(3,5); h++){
-                friendPositions.Add(houses[UnityEngine.Random.Range(0, houses.Length)]);
-            }
+            var officePosition = offices[UnityEngine.Random.Range(0, offices.Length)];
 
             //Vector3 position = new float3((UnityEngine.Random.Range(0, gridWidth)) * 10f + UnityEngine.Random.Range(0, 10f), (UnityEngine.Random.Range(0, gridHeight)) * 10f + UnityEngine.Random.Range(0, 10f), 0);
             Vector3 position = new float3(homePosition.x * 10f + UnityEngine.Random.Range(0, 10f), homePosition.y * 10f + UnityEngine.Random.Range(0, 10f), 0);
@@ -82,12 +87,9 @@ public class Human : MonoBehaviour{
                 sociality = UnityEngine.Random.Range(0, 10 * 60),
                 fatigue = UnityEngine.Random.Range(0, 10 * 60),
                 socialResposibility = UnityEngine.Random.Range(0, 100f) / 100f,
-                homePosition = homePosition
+                homePosition = homePosition,
+                officePosition = officePosition
             }) ;
-
-
-            //Time Scale
-            Time.timeScale = conf.timeScale;
 
             //components depending on infection
             float uvWidth = 1f;
@@ -126,7 +128,7 @@ public class Human : MonoBehaviour{
 
                 exposedThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysExposed * 60 * 24, conf.maxDaysExposed * 60 * 24);
 
-                entityManager.AddComponentData(entity, new InfectionComponent{//TODO add to archetype
+                entityManager.SetComponentData(entity, new InfectionComponent{
                     infected=true,
                     status = Status.infectious,
                     contagionCounter = 0,
@@ -186,7 +188,7 @@ public class Human : MonoBehaviour{
 
                 exposedThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysExposed * 60 * 24, conf.maxDaysExposed * 60 * 24);
 
-                entityManager.AddComponentData(entity, new InfectionComponent{
+                entityManager.SetComponentData(entity, new InfectionComponent{
                     infected=false,
                     status = Status.susceptible,
                     contagionCounter = 0,
@@ -225,7 +227,7 @@ public class Human : MonoBehaviour{
                 pathIndex = -1 
             });
         }
-
+        offices.Dispose();
         entityArray.Dispose();
         mapGrid.Dispose();
     }
