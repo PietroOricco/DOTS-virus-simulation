@@ -7,10 +7,13 @@ using Unity.Collections;
 public struct HumanComponent : IComponentData
 {
     // human needs
-    public float hunger;        //supermarket
-    public float sportivity;    //park 
-    public float sociality;     //pub
-    public float fatigue;       //home
+    public float hunger;        
+    public float sportivity;     
+    public float sociality;     
+    public float fatigue;
+
+    public float grocery;
+    public float work;
     // social behavior
     public float socialResposibility;
     //home
