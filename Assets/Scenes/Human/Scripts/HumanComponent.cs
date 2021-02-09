@@ -15,4 +15,5 @@ public struct HumanComponent : IComponentData
     public float socialResposibility;
     //home
     public Vector2Int homePosition;
+    public Vector2Int officePosition;
 }
