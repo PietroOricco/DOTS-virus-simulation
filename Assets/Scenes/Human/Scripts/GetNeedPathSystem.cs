@@ -67,9 +67,21 @@ public class GetNeedPathSystem : SystemBase {
 			NativeArray<TileMapEnum.TileMapSprite> result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
 			switch(needComponent.currentNeed){
 				case NeedType.needForFood:
-					result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
+					if(rnd.NextDouble()<0.20){
+						result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+						result[1]=TileMapEnum.TileMapSprite.Pub;
+					}
+					else{
+						// Go home to eat most of the times
+						result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
+						found = true;
+						endX = humanComponent.homePosition.x;
+						endY = humanComponent.homePosition.y;
+					}
+					break;
+				case NeedType.needForGrocery:
+					result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
 					result[0]=TileMapEnum.TileMapSprite.Supermarket;
-					result[1]=TileMapEnum.TileMapSprite.Pub;
 					break;
 				case NeedType.needForSociality:
 					if(rnd.NextDouble()<0.20){
@@ -98,7 +110,13 @@ public class GetNeedPathSystem : SystemBase {
 					found = true;
 					endX = humanComponent.homePosition.x;
 					endY = humanComponent.homePosition.y;
-					break;	
+					break;
+				case NeedType.needToWork:
+					result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
+					found = true;
+					endX = humanComponent.officePosition.x;
+					endY = humanComponent.officePosition.y;
+					break;
 			}
 
 			for(int l=0; l < result.Length && !found; l++){
@@ -154,48 +172,6 @@ public class GetNeedPathSystem : SystemBase {
 		directions.Dispose();
 		start_offset.Dispose();
     }
-
-	private NativeArray<TileMapEnum.TileMapSprite> GetPlacesForStatus(NeedType currentNeed){
-		NativeArray<TileMapEnum.TileMapSprite> result;
-		switch(currentNeed){
-			case NeedType.needForFood:
-				result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
-				result[0]=TileMapEnum.TileMapSprite.Supermarket;
-				result[1]=TileMapEnum.TileMapSprite.Pub;
-				return result;
-			case NeedType.needForSociality:
-				result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
-				result[0]=TileMapEnum.TileMapSprite.Park;
-				result[1]=TileMapEnum.TileMapSprite.Pub;
-				return result;
-			case NeedType.needForSport:
-				result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
-				result[0]=TileMapEnum.TileMapSprite.Park;
-				return result;
-			case NeedType.needToRest:
-				result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
-				result[0]=TileMapEnum.TileMapSprite.Home;
-				result[1]=TileMapEnum.TileMapSprite.Home2;
-				return result;
-			default:
-				return new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
-		}
-	}
-
-
-	private int FindTarget(int startX, int startY, NeedType status, int range, NativeArray<TileMapEnum.TileMapSprite> grid, int width, int height) {
-		int i, j;
-
-		for (i = startX - range; i < startX + range; i++) {
-			for (j = startY - range; j < startY + range; j++) {
-				if (i >= 0 && j >= 0 && i < width && j < height )
-					//if (ArrayUtility.Contains(GetPlacesForStatus(status), grid[i+j*width])){
-						return i+j*width;
-					//}
-			}
-		}
-		return -1;
-	}
 
 	private static void GetXY(float3 worldPosition, float3 originPosition, float cellSize, out int x, out int y) {
         x = (int)math.floor((worldPosition - originPosition).x / cellSize);

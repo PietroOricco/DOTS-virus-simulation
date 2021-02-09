@@ -11,11 +11,11 @@ public struct HumanComponent : IComponentData
     public float sportivity;     
     public float sociality;     
     public float fatigue;
-
     public float grocery;
     public float work;
     // social behavior
     public float socialResposibility;
     //home
     public Vector2Int homePosition;
+    public Vector2Int officePosition;
 }
