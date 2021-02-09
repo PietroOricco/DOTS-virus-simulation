@@ -39,47 +39,15 @@ public class HumanSystem : SystemBase{
         var cellSize = CellSize;
         var grid = Grid;
 
-        JobHandle jobhandle = Entities.ForEach((ref Translation t, ref HumanComponent hc) =>{
+        JobHandle jobhandle = Entities.ForEach(( ref HumanComponent hc) =>{
 
             //increment of 1 value per second for each HumanComponent parameters
-            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 25 * 60);
-            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 25 * 60);
-            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 25 * 60);
-            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 25 * 60);
-
-            //retrieve entity position
-            GetXY(t.Value, Vector3.zero, cellSize, out int currentX, out int currentY); //TODO fix hardcoded origin
-
-            //decrement based to position:
-            //home -> decrement fatigue
-            //park -> decrement sociality and sportivity
-            //pub -> decrement hunger and sociality
-            //road -> decrement sportivity
-            switch (grid[currentX+currentY*width]){
-                case TileMapEnum.TileMapSprite.Home:
-                case TileMapEnum.TileMapSprite.Home2:
-                    if(hc.homePosition.x==currentX&&hc.homePosition.y==currentY)
-                        hc.fatigue = Math.Max(0, hc.fatigue-3f* deltaTime);
-                    else
-                        hc.sociality = Math.Max(0, hc.sociality-6f* deltaTime);
-                    break;
-                case TileMapEnum.TileMapSprite.Park:
-                    hc.sportivity = Math.Max(0, hc.sportivity-25f* deltaTime);
-                    hc.sociality = Math.Max(0, hc.sociality-6f* deltaTime);
-                    break;
-                case TileMapEnum.TileMapSprite.Pub:
-                    hc.hunger = Math.Max(0, hc.hunger-7f* deltaTime);
-                    hc.sociality = Math.Max(0, hc.sociality-6f* deltaTime);
-                    break;
-                case TileMapEnum.TileMapSprite.Supermarket:
-                    hc.hunger = Math.Max(0, hc.hunger-7f* deltaTime);
-                    break;
-                case TileMapEnum.TileMapSprite.RoadHorizontal:
-                case TileMapEnum.TileMapSprite.RoadVertical:
-                case TileMapEnum.TileMapSprite.RoadCrossing:
-                    hc.sportivity = Math.Max(0, hc.sportivity-0.5f* deltaTime);
-                    break;
-            }
+            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 7 * 60);
+            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 17 * 60);
+            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 11 * 60);
+            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 23 * 60);
+            hc.grocery = math.min(hc.sportivity + 1f * deltaTime, 7*25 * 60);
+            hc.work = math.min(hc.sportivity + 1f * deltaTime, 17 * 60);
         }).ScheduleParallel(Dependency);
         jobhandle.Complete();
 
@@ -103,7 +71,7 @@ public class HumanSystem : SystemBase{
                     searchRadius=2
                 });
             }
-            else if (hc.sportivity > 24*60){
+            else if (hc.sportivity > 23*60){
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex , entity, new NeedComponent{
                     currentNeed=NeedType.needForSport
                 });
@@ -119,19 +87,90 @@ public class HumanSystem : SystemBase{
                     searchRadius=2
                 });
             }
+            else if (hc.grocery > 7*24 * 60)
+            {
+                ecb.AddComponent<NeedComponent>(nativeThreadIndex, entity, new NeedComponent
+                {
+                    currentNeed = NeedType.needForGrocery
+                });
+                ecb.AddComponent<NeedPathParams>(nativeThreadIndex, entity, new NeedPathParams
+                {
+                    searchRadius = 2
+                });
+            }
+            else if (hc.work > 16 * 60)
+            {
+                ecb.AddComponent<NeedComponent>(nativeThreadIndex, entity, new NeedComponent
+                {
+                    currentNeed = NeedType.needToWork
+                });
+                ecb.AddComponent<NeedPathParams>(nativeThreadIndex, entity, new NeedPathParams
+                {
+                    searchRadius = 2
+                });
+            }
         }).ScheduleParallel(jobhandle);
 
         jobhandle1.Complete();
 
         //manage satisfied needs, when value for a parameter decreases under 25 as threshold 
-        JobHandle jobhandle2 = Entities.ForEach((Entity entity, int nativeThreadIndex, in HumanComponent hc, in NeedComponent needComponent) =>{
-            if (needComponent.currentNeed == NeedType.needForFood && hc.hunger < 25f)
+        JobHandle jobhandle2 = Entities.ForEach((Entity entity, int nativeThreadIndex, ref Translation t, ref HumanComponent hc, in NeedComponent needComponent) =>{
+            //retrieve entity position
+            GetXY(t.Value, Vector3.zero, cellSize, out int currentX, out int currentY); //TODO fix hardcoded origin
+
+            //decrement based to position:
+            //home -> decrement fatigue
+            //park -> decrement sociality and sportivity
+            //pub -> decrement hunger and sociality
+            //road -> decrement sportivity
+            switch (grid[currentX + currentY * width])
+            {
+                case TileMapEnum.TileMapSprite.Home:
+                case TileMapEnum.TileMapSprite.Home2:
+                    if (hc.homePosition.x == currentX && hc.homePosition.y == currentY && needComponent.currentNeed== NeedType.needToRest)
+                        hc.fatigue = Math.Max(0, hc.fatigue - 2f * deltaTime);
+                    else if (hc.homePosition.x == currentX && hc.homePosition.y == currentY && needComponent.currentNeed == NeedType.needForFood)
+                        hc.fatigue = Math.Max(0, hc.hunger - 7f * deltaTime);
+                    else
+                    hc.sociality = Math.Max(0, hc.sociality - 5f * deltaTime);
+                    break;
+                case TileMapEnum.TileMapSprite.Park:
+                    if (needComponent.currentNeed == NeedType.needForSport)
+                        hc.sportivity = Math.Max(0, hc.sportivity - 15f * deltaTime);
+                    else if (needComponent.currentNeed == NeedType.needForSociality)
+                        hc.sociality = Math.Max(0, hc.sociality - 5f * deltaTime);
+                    break;
+                case TileMapEnum.TileMapSprite.Pub:
+                    if (needComponent.currentNeed == NeedType.needForFood)
+                        hc.hunger = Math.Max(0, hc.hunger - 7f * deltaTime);
+                    else if (needComponent.currentNeed == NeedType.needForSociality)
+                        hc.sociality = Math.Max(0, hc.sociality - 5f * deltaTime);
+                    break;
+                case TileMapEnum.TileMapSprite.Supermarket:
+                    hc.grocery = Math.Max(0, hc.grocery - 7*24f * deltaTime);
+                    break;
+                case TileMapEnum.TileMapSprite.Office:
+                    hc.work = Math.Max(0, hc.grocery - 2f * deltaTime);
+                    break;
+
+                case TileMapEnum.TileMapSprite.RoadHorizontal:
+                case TileMapEnum.TileMapSprite.RoadVertical:
+                case TileMapEnum.TileMapSprite.RoadCrossing:
+          
+                    break;
+            }
+
+            if (needComponent.currentNeed == NeedType.needForFood && hc.hunger < 25f* 7 * 0.6)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
-            else if (needComponent.currentNeed == NeedType.needToRest && hc.fatigue < 25f)
+            else if (needComponent.currentNeed == NeedType.needToRest && hc.fatigue < 25f*17*0.6)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
-            else if (needComponent.currentNeed == NeedType.needForSport && hc.sportivity < 25f)
+            else if (needComponent.currentNeed == NeedType.needForSport && hc.sportivity < 25f*23*0.6)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
-            else if (needComponent.currentNeed == NeedType.needForSociality && hc.sociality < 25f)
+            else if (needComponent.currentNeed == NeedType.needForSociality && hc.sociality < 25f*11*0.6)
+                ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
+            else if (needComponent.currentNeed == NeedType.needForGrocery && hc.grocery < 25f * 24 *8 * 0.6)
+                ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
+            else if (needComponent.currentNeed == NeedType.needToWork && hc.work < 25f * 17 * 0.6)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
         }).ScheduleParallel(jobhandle1);
 
