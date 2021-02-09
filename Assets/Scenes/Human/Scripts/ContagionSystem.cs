@@ -104,7 +104,6 @@ public class ContagionSystem : SystemBase
                 }
                 qe.typeEnum = QuadrantEntity.TypeEnum.exposed;
                 ic.status = Status.exposed;
-                   
                 ic.exposedCounter = 0;
             }
 
@@ -113,6 +112,7 @@ public class ContagionSystem : SystemBase
             {
                 qe.typeEnum = QuadrantEntity.TypeEnum.infectious;
                 ic.status = Status.infectious;
+                ic.infected=true;
 
                 if (ic.humanSymptomsProbability > (100 - ic.globalSymptomsProbability))
                 {
@@ -188,6 +188,7 @@ public class ContagionSystem : SystemBase
                         }
                 
                     ic.status = Status.recovered;
+                    ic.infected=false;
                     //qe.typeEnum = QuadrantEntity.TypeEnum.recovered;
                     ic.recoveredCounter = 0;
                 }

@@ -1,14 +1,14 @@
 {
-   "numberOfHumans" : 100000,
-   "numberOfInfects" : 20,
-   "timeScale" : 60,
+   "numberOfHumans" : 150000,
+   "numberOfInfects" : 2,
+   "timeScale" : 40,
    "probabilityOfSymptomatic" : 58,
    "probabilityOfDeath" : 5,
-   "minDaysInfectious": 2,
-   "maxDaysInfectious": 4,
+   "minDaysInfectious": 4,
+   "maxDaysInfectious": 11,
    "minDaysRecovered": 30,
    "maxDaysRecovered": 45,
-   "minDaysExposed": 3,
-   "maxDaysExposed": 6,
+   "minDaysExposed": 1,
+   "maxDaysExposed": 3,
    "map": "extralarge.tmx"
 }

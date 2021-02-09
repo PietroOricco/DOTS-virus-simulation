@@ -69,7 +69,7 @@ public class GetNeedPathSystem : SystemBase {
 				case NeedType.needForFood:
 					if(rnd.NextDouble()<0.20){
 						result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
-						result[1]=TileMapEnum.TileMapSprite.Pub;
+						result[0]=TileMapEnum.TileMapSprite.Pub;
 					}
 					else{
 						// Go home to eat most of the times

@@ -46,8 +46,8 @@ public class HumanSystem : SystemBase{
             hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 17 * 60);
             hc.sociality = math.min(hc.sociality + 1f * deltaTime, 11 * 60);
             hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 23 * 60);
-            hc.grocery = math.min(hc.sportivity + 1f * deltaTime, 7*25 * 60);
-            hc.work = math.min(hc.sportivity + 1f * deltaTime, 17 * 60);
+            hc.grocery = math.min(hc.grocery + 1f * deltaTime, 3*25 * 60);
+            hc.work = math.min(hc.work + 1f * deltaTime, 17 * 60);
         }).ScheduleParallel(Dependency);
         jobhandle.Complete();
 
@@ -87,7 +87,7 @@ public class HumanSystem : SystemBase{
                     searchRadius=2
                 });
             }
-            else if (hc.grocery > 7*24 * 60)
+            else if (hc.grocery > 3*24 * 60)
             {
                 ecb.AddComponent<NeedComponent>(nativeThreadIndex, entity, new NeedComponent
                 {
@@ -113,8 +113,8 @@ public class HumanSystem : SystemBase{
 
         jobhandle1.Complete();
 
-        //manage satisfied needs, when value for a parameter decreases under 25 as threshold 
-        JobHandle jobhandle2 = Entities.ForEach((Entity entity, int nativeThreadIndex, ref Translation t, ref HumanComponent hc, in NeedComponent needComponent) =>{
+        //manage satisfied needs, when value for a parameter decreases under 25% as threshold 
+        JobHandle jobhandle2 = Entities.ForEach((Entity entity, int nativeThreadIndex, ref HumanComponent hc, in Translation t, in NeedComponent needComponent) =>{
             //retrieve entity position
             GetXY(t.Value, Vector3.zero, cellSize, out int currentX, out int currentY); //TODO fix hardcoded origin
 
@@ -127,30 +127,32 @@ public class HumanSystem : SystemBase{
             {
                 case TileMapEnum.TileMapSprite.Home:
                 case TileMapEnum.TileMapSprite.Home2:
-                    if (hc.homePosition.x == currentX && hc.homePosition.y == currentY && needComponent.currentNeed== NeedType.needToRest)
-                        hc.fatigue = Math.Max(0, hc.fatigue - 2f * deltaTime);
-                    else if (hc.homePosition.x == currentX && hc.homePosition.y == currentY && needComponent.currentNeed == NeedType.needForFood)
-                        hc.fatigue = Math.Max(0, hc.hunger - 7f * deltaTime);
+                    if (hc.homePosition.x == currentX && hc.homePosition.y == currentY){
+                        if(needComponent.currentNeed== NeedType.needToRest)
+                            hc.fatigue = Math.Max(0, hc.fatigue - (2f+1f) * deltaTime);
+                        else if (needComponent.currentNeed == NeedType.needForFood)
+                            hc.hunger = Math.Max(0, hc.hunger - (7f+1f) * deltaTime);
+                    }
                     else
-                    hc.sociality = Math.Max(0, hc.sociality - 5f * deltaTime);
+                        hc.sociality = Math.Max(0, hc.sociality - (5f+1f) * deltaTime);
                     break;
                 case TileMapEnum.TileMapSprite.Park:
                     if (needComponent.currentNeed == NeedType.needForSport)
-                        hc.sportivity = Math.Max(0, hc.sportivity - 15f * deltaTime);
+                        hc.sportivity = Math.Max(0, hc.sportivity - (15f+1f) * deltaTime);
                     else if (needComponent.currentNeed == NeedType.needForSociality)
-                        hc.sociality = Math.Max(0, hc.sociality - 5f * deltaTime);
+                        hc.sociality = Math.Max(0, hc.sociality - (5f+1f) * deltaTime);
                     break;
                 case TileMapEnum.TileMapSprite.Pub:
                     if (needComponent.currentNeed == NeedType.needForFood)
-                        hc.hunger = Math.Max(0, hc.hunger - 7f * deltaTime);
+                        hc.hunger = Math.Max(0, hc.hunger - (7f+1f) * deltaTime);
                     else if (needComponent.currentNeed == NeedType.needForSociality)
-                        hc.sociality = Math.Max(0, hc.sociality - 5f * deltaTime);
+                        hc.sociality = Math.Max(0, hc.sociality - (5f+1f) * deltaTime);
                     break;
                 case TileMapEnum.TileMapSprite.Supermarket:
-                    hc.grocery = Math.Max(0, hc.grocery - 7*24f * deltaTime);
+                    hc.grocery = Math.Max(0, hc.grocery - (3*24f+1f) * deltaTime);
                     break;
                 case TileMapEnum.TileMapSprite.Office:
-                    hc.work = Math.Max(0, hc.grocery - 2f * deltaTime);
+                    hc.work = Math.Max(0, hc.work - (2f+1f) * deltaTime);
                     break;
 
                 case TileMapEnum.TileMapSprite.RoadHorizontal:
@@ -168,7 +170,7 @@ public class HumanSystem : SystemBase{
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
             else if (needComponent.currentNeed == NeedType.needForSociality && hc.sociality < 25f*11*0.6)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
-            else if (needComponent.currentNeed == NeedType.needForGrocery && hc.grocery < 25f * 24 *8 * 0.6)
+            else if (needComponent.currentNeed == NeedType.needForGrocery && hc.grocery < 25f * 25 *3 * 0.6)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
             else if (needComponent.currentNeed == NeedType.needToWork && hc.work < 25f * 17 * 0.6)
                 ecb.RemoveComponent<NeedComponent>(nativeThreadIndex, entity);
