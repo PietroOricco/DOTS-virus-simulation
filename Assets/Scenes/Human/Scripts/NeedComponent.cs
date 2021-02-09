@@ -10,5 +10,7 @@ public enum NeedType {
     needForSport,
     needForSociality,
     needToRest,
+    needToWork,
+    needForGrocery,
     none
 }
