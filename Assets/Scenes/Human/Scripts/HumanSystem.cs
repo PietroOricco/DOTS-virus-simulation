@@ -39,15 +39,30 @@ public class HumanSystem : SystemBase{
         var cellSize = CellSize;
         var grid = Grid;
 
+        var lockdown = Human.conf.lockdown;
+
         JobHandle jobhandle = Entities.ForEach(( ref HumanComponent hc) =>{
 
-            //increment of 1 value per second for each HumanComponent parameters
-            hc.hunger = math.min(hc.hunger + 1f * deltaTime, 7 * 60);
-            hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 17 * 60);
-            hc.sociality = math.min(hc.sociality + 1f * deltaTime, 11 * 60);
-            hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 23 * 60);
-            hc.grocery = math.min(hc.grocery + 1f * deltaTime, 3*25 * 60);
-            hc.work = math.min(hc.work + 1f * deltaTime, 17 * 60);
+            if (!lockdown)
+            {
+                //increment of 1 value per second for each HumanComponent parameters
+                hc.hunger = math.min(hc.hunger + 1f * deltaTime, 7 * 60);
+                hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 17 * 60);
+                hc.sociality = math.min(hc.sociality + 1f * deltaTime, 11 * 60);
+                hc.sportivity = math.min(hc.sportivity + 1f * deltaTime, 23 * 60);
+                hc.grocery = math.min(hc.grocery + 1f * deltaTime, 3 * 25 * 60);
+                hc.work = math.min(hc.work + 1f * deltaTime, 17 * 60);
+            }
+            else
+            {
+                hc.hunger = math.min(hc.hunger + 1f * deltaTime, 7 * 60);
+                hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 17 * 60);
+                hc.work = math.min(hc.work + hc.jobEssentiality * deltaTime, 17 * 60);
+                hc.grocery = math.min(hc.grocery + 0.5f * deltaTime, 3 * 25 * 60);
+
+                hc.sociality = math.min(hc.sociality + (1-hc.socialResposibility)*0.5f * deltaTime, 11 * 60);
+                hc.sportivity = math.min(hc.sportivity + (1 - hc.socialResposibility) * 0.5f * deltaTime, 23 * 60);
+            }
         }).ScheduleParallel(Dependency);
         jobhandle.Complete();
 
