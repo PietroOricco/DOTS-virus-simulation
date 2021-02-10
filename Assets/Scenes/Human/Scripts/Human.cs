@@ -43,7 +43,7 @@ public class Human : MonoBehaviour{
 
         //Time Scale
         Time.timeScale = conf.timeScale;
-        //Population_counter.population = conf.numberOfHumans;
+
         entityArray = new NativeArray<Entity>(conf.numberOfHumans, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
@@ -86,7 +86,9 @@ public class Human : MonoBehaviour{
                 sportivity = UnityEngine.Random.Range(0, 10 * 60),
                 sociality = UnityEngine.Random.Range(0, 10 * 60),
                 fatigue = UnityEngine.Random.Range(0, 10 * 60),
-                socialResposibility = UnityEngine.Random.Range(0, 100f) / 100f,
+                grocery = UnityEngine.Random.Range(0, 3 * 25 * 60),
+                socialResposibility = conf.lockdown ? GenerateNormalRandom(0.75f, 0.2f, 0.50f, 1f) : GenerateNormalRandom(0.5f, 0.3f, 0f, 1f),
+                jobEssentiality = conf.lockdown ? GenerateNormalRandom(0.1f, 0.1f, 0f, 1f) / 100f : 1,
                 homePosition = homePosition,
                 officePosition = officePosition
             }) ;
@@ -129,13 +131,11 @@ public class Human : MonoBehaviour{
                 exposedThreshold = GenerateNormalRandom(mean, sigma, conf.minDaysExposed * 60 * 24, conf.maxDaysExposed * 60 * 24);
 
                 entityManager.SetComponentData(entity, new InfectionComponent{
-                    infected=true,
-                    status = Status.infectious,
+                    status = Status.exposed,
                     contagionCounter = 0,
                     infectiousCounter = 0,
                     exposedCounter = 0,
                     recoveredCounter = 0,
-                    symptomatic = true,
 
                     globalSymptomsProbability = conf.probabilityOfSymptomatic,
                     globalDeathProbability = conf.probabilityOfDeath,
@@ -147,8 +147,6 @@ public class Human : MonoBehaviour{
                     exposedThreshold = exposedThreshold,
                     recoveredThreshold = recoveredThreshold
                 });
-                Counter.initialInfectedCounter++;
-                synthomatic_counter.initialSymptomaticCounter++;
                 //graphics
                 float uvOffsetY = 0.0f;
                 SpriteSheetAnimation_Data spriteSheetAnimationData;

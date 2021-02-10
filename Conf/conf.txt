@@ -1,5 +1,5 @@
 {
-   "numberOfHumans" : 150000,
+   "numberOfHumans" : 100000,
    "numberOfInfects" : 2,
    "timeScale" : 40,
    "probabilityOfSymptomatic" : 58,
@@ -10,5 +10,6 @@
    "maxDaysRecovered": 45,
    "minDaysExposed": 1,
    "maxDaysExposed": 3,
-   "map": "extralarge.tmx"
+   "map": "extralarge.tmx",
+   "lockdown": false
 }

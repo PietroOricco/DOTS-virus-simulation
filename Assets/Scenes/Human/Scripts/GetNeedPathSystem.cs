@@ -52,6 +52,7 @@ public class GetNeedPathSystem : SystemBase {
 		var directions = this.directions;
 
 		var houses = myHouses;
+		var lockdown = Human.conf.lockdown;
 		
         JobHandle jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, ref NeedPathParams needPathParams, in Translation translation, in NeedComponent needComponent, in HumanComponent humanComponent) => {
 
@@ -67,7 +68,7 @@ public class GetNeedPathSystem : SystemBase {
 			NativeArray<TileMapEnum.TileMapSprite> result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
 			switch(needComponent.currentNeed){
 				case NeedType.needForFood:
-					if(rnd.NextDouble()<0.20){
+					if(rnd.NextDouble()<0.20&&!lockdown){
 						result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
 						result[0]=TileMapEnum.TileMapSprite.Pub;
 					}
@@ -84,7 +85,7 @@ public class GetNeedPathSystem : SystemBase {
 					result[0]=TileMapEnum.TileMapSprite.Supermarket;
 					break;
 				case NeedType.needForSociality:
-					if(rnd.NextDouble()<0.20){
+					if((rnd.NextDouble()<0.20&&!lockdown)||(rnd.NextDouble()<0.20*humanComponent.socialResposibility&&lockdown)){
 						result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
 						found = true;
 						int friendIndex;
@@ -94,10 +95,14 @@ public class GetNeedPathSystem : SystemBase {
 						endX = houses[friendIndex].x;
 						endY = houses[friendIndex].y;
 					}
-					else{
+					else if(!lockdown){
 						result = new NativeArray<TileMapEnum.TileMapSprite>(2, Allocator.Temp);
 						result[0]=TileMapEnum.TileMapSprite.Park;
 						result[1]=TileMapEnum.TileMapSprite.Pub;
+					}
+					else{
+						result = new NativeArray<TileMapEnum.TileMapSprite>(1, Allocator.Temp);
+						result[0]=TileMapEnum.TileMapSprite.Park;
 					}
 
 					break;

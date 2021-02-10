@@ -15,6 +15,7 @@ public struct HumanComponent : IComponentData
     public float work;
     // social behavior
     public float socialResposibility;
+    public float jobEssentiality;
     //home
     public Vector2Int homePosition;
     public Vector2Int officePosition;

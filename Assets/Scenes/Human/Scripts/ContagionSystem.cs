@@ -35,7 +35,7 @@ public class ContagionSystem : SystemBase
         quadrantMultiHashMap2 = QuadrantSystem.quadrantMultiHashMap;
         m_EndSimulationEcbSystem = World.GetOrCreateSystem<EndInitializationEntityCommandBufferSystem>();
         infectedCounter = conf.numberOfInfects;
-        symptomaticCounter = conf.numberOfInfects;
+        symptomaticCounter = 0;
         asymptomaticCounter = 0;
         recoveredCounter = 0;
         deathCounter = 0;
