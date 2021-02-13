@@ -8,6 +8,45 @@ Each entity replicates the human behaviour, characterized by some primary basic 
 The purpose of the project is to simulate the trend of a viral infection enhancing the parallelism provided by ECS: many entities are spawn at the beginning, the majority is non-infected. The intention is to show how a potential viral infection can spread among the population of entities according both to viral parameters but also on entities behaviour.
 <br/>
 
+ENTITIES
+------------
+- Humans are represented with a 2d sprite symbol.
+  
+- The color of the symbol changes with the “infection state” in which the human is.
+  
+- The simulation follows the SEIRS model, it means that the contagion follow a state machine of the kind:
+	- S susceptible
+	- E exposed
+	- I infected, modeled as Symptomatic and Asymptomatic
+	- R recovered or removed, the entity may also die
+	- S susceptible, after some time after recovery, an entity may be infected again
+
+![alt text](./img/statusDiagram.jpg)
+  
+- Humans movement based on pathfinding in order to satisfy needs, each time a human needs to satisfy a demand, the pathfinding algorithm drives the human to the closest place where to satisfy  the necessity:
+
+<br/>
+
+_ | Home | Park | Pub | Supermarket | Office
+:------: | :------: | :------: | :------: | :------: | :------:
+  Fatigue | X | | | |
+  Hunger | X | | X | |
+  Sportivity |  | X | | |
+  Sociality |  | X | X | |
+  Grocery |  | | | X |
+  Work |  | | | | X |
+
+<br/>
+
+CONTAGION
+------------
+Contagion, probability based formula that keeps into account several parameters such as:
+- Distance, 2 meters is the value of risk 
+- Time, 15 minutes are enough to make infection happen
+- Social Responsibility (that represents several factors about social behaviours during a pandemic, mainly mask usage and social distancing)
+
+<br/>
+
 HOW TO CONFIGURE THE SIMULATION
 ------------
 ./Conf/conf.json is the configuration file, the user can set up many parameters for modeling the simulation, such as 
@@ -37,37 +76,3 @@ HOW TO USE
 - W-A-S-D for xy movement on the map 
 
 <br/> 
-
-ENTITIES
-------------
-- Humans are represented with a 2d sprite symbol.
-  
-- The color of the symbol changes with the “state” in which the human is.
-  
-- The simulation follows the SEIRS model, it means that the contagion follow a state machine of the kind:
-	- S susceptible
-	- E exposed
-	- I infected, modeled as Symptomatic and Asymptomatic
-	- R recovered or removed, the entity may also die
-	- S susceptible, after some time after recovery, an entity may be infected again
-  
-- Humans movement based on pathfinding in order to satisfy needs, each time a human needs to satisfy a demand, the pathfinding algorithm drives the human to the closest place where to satisfy  the necessity:<br/>
-
-_ | Home | Park | Pub | Supermarket | Office
-:------: | :------: | :------: | :------: | :------: | :------:
-  Fatigue | X | | | |
-  Hunger | X | | X | |
-  Sportivity |  | X | | |
-  Sociality |  | X | X | |
-  Grocery |  | | | X |
-  Work |  | | | | X |
-
-<br/>
-
-CONTAGION
-------------
-Contagion, probability based formula that keeps into account several parameters such as:
-- Distance, 2 meters is the value of risk 
-- Time, 15 minutes are enough to make infection happen
-- Social Responsibility (that represents several factors about social behaviours during a pandemic, mainly mask usage and social distancing)
-<br/>
