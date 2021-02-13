@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Datetime : MonoBehaviour
 {
     public float REAL_SECONDS_PER_INGAME_MINUTE = 1f;
-    private float total_minutes = 0;
+    public static float total_minutes = 0;
     public static Text datetimeText;
 
     // Start is called before the first frame update

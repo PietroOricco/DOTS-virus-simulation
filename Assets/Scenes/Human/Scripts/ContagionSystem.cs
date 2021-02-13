@@ -7,6 +7,7 @@ using System.Threading;
 using UnityEngine;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Burst;
+using System.IO;
 
 [UpdateAfter(typeof(QuadrantSystem))]
 //[UpdateAfter(typeof(PathFollowSystem))]
@@ -28,6 +29,8 @@ public class ContagionSystem : SystemBase
     public static long recoveredCounter;
     public static long deathCounter;
     public static long populationCounter;
+    private StreamWriter writer;
+    public static string logPath = "log.txt";
 
     protected override void OnCreate()
     {
@@ -40,6 +43,8 @@ public class ContagionSystem : SystemBase
         recoveredCounter = 0;
         deathCounter = 0;
         populationCounter = conf.numberOfHumans;
+        writer = new StreamWriter(logPath, false); // false is for overwrite existing file
+        writer.WriteLine("Population\tExposed\tSymptomatic\tAsymptomatic\tDeath\tRecovered\tMinutesPassed");
     }
 
     protected override void OnUpdate(){
@@ -52,16 +57,16 @@ public class ContagionSystem : SystemBase
         localInfectedCounter[0]=0;
         
         NativeArray<long> localSymptomaticCounter = new NativeArray<long>(1, Allocator.TempJob);
-        localInfectedCounter[0]=0;
+        localSymptomaticCounter[0]=0;
 
         NativeArray<long> localAsymptomaticCounter = new NativeArray<long>(1, Allocator.TempJob);
-        localInfectedCounter[0] = 0;
+        localAsymptomaticCounter[0] = 0;
 
         NativeArray<long> localDeathCounter = new NativeArray<long>(1, Allocator.TempJob);
-        localInfectedCounter[0] = 0;
+        localDeathCounter[0] = 0;
 
         NativeArray<long> localRecoveredCounter = new NativeArray<long>(1, Allocator.TempJob);
-        localInfectedCounter[0] = 0;
+        localRecoveredCounter[0] = 0;
 
         //job -> each element, if not infected, check if there are infected in its same quadrant
         var jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
@@ -249,11 +254,26 @@ public class ContagionSystem : SystemBase
             Interlocked.Add(ref populationCounter, -Interlocked.Read(ref ((long*)localDeathCounter.GetUnsafePtr())[0]));
         }
 
+        //Write some text to the test.txt file
+        writer.WriteLine(Interlocked.Read(ref populationCounter)+"\t"
+                            +Interlocked.Read(ref infectedCounter)+"\t"
+                            +Interlocked.Read(ref symptomaticCounter)+"\t"
+                            +Interlocked.Read(ref asymptomaticCounter)+"\t"
+                            +Interlocked.Read(ref deathCounter)+"\t"
+                            +Interlocked.Read(ref recoveredCounter)+"\t"
+                            +Datetime.total_minutes);
+
         localInfectedCounter.Dispose();
         localAsymptomaticCounter.Dispose();
         localSymptomaticCounter.Dispose();
         localRecoveredCounter.Dispose();
         localDeathCounter.Dispose();
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        writer.Close();
     }
 }
 
