@@ -26,10 +26,13 @@ plt.xticks(range(0, len(data['MinutesPassed']), 10),
 
 plt.plot(data['MinutesPassed'], data['Population'], label="Total Population")
 plt.plot(data['MinutesPassed'], data['Exposed'], label="Exposed")
+plt.plot(data['MinutesPassed'], data['TotalExposed'], label="Total Exposed")
 plt.plot(data['MinutesPassed'], data['Symptomatic'], label="Symptomatic")
 plt.plot(data['MinutesPassed'], data['Asymptomatic'], label="Asymptomatic")
 plt.plot(data['MinutesPassed'], data['Death'], label="Death")
 plt.plot(data['MinutesPassed'], data['Recovered'], label="Recovered")
+plt.plot(data['MinutesPassed'], data['TotalRecovered'],
+         label="Total Recovered")
 plt.title("Data analysis without lockdown")
 plt.legend()
 plt.grid(True)
