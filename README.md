@@ -13,6 +13,8 @@ ENTITIES
 - Humans are represented with a 2d sprite symbol.
   
 - The color of the symbol changes with the “infection state” in which the human is.
+
+![alt text](./img/Sprite_Legend.png)
   
 - The simulation follows the SEIRS model, it means that the contagion follow a state machine of the kind:
 	- S susceptible
@@ -27,20 +29,39 @@ ENTITIES
 
 <br/>
 
-_ | Home | Park | Pub | Supermarket | Office
-:------: | :------: | :------: | :------: | :------: | :------:
-  Fatigue | X | | | |
-  Hunger | X | | X | |
-  Sportivity |  | X | | |
-  Sociality |  | X | X | |
-  Grocery |  | | | X |
-  Work |  | | | | X |
+|     _      | Home  | Park  | Pub*  | Supermarket | Office |
+| :--------: | :---: | :---: | :---: | :---------: | :----: |
+|  Fatigue   |   X   |       |       |             |
+|   Hunger   |   X   |       |   X   |             |
+| Sportivity |       |   X   |       |             |
+| Sociality  |  X*   |   X   |   X   |             |
+|  Grocery   |       |       |       |      X      |
+|    Work    |       |       |       |             |   X    |
 
 <br/>
+The Home in the Sociality need is not the Human home, in order to simulate visit to friends.
+If the lockdown setting is True, all needs increase more slowly and are correlated to the human social responsibility. Furthermore, the Pubs are closed. 
+
+Needs are set in order to reproduce a normal behavior:
+  - Fatigue: Human rest for 8 hours, need restored after 16 hours from fulfillment;
+  - Hunger: Human eat for 1 hour three times each day
+  - Sportivity: Human does 1.5 hours of sport every two days
+  - Sociality: Human does 2 hours of sociality each day
+  - Grocery: Human goes to the supermarket for one hour once every 3 days
+  - Work: Human goes to work for 8 hourse every day
+
+
+
+MAP
+------------
+The map is implemented using a tilemap file as input, specified in the configuration file.
+Each sprite model a specific city element:
+
+![alt text](./img/City_Legend.png)
 
 CONTAGION
 ------------
-Contagion, probability based formula that keeps into account several parameters such as:
+Contagion probability based formula that keeps into account several parameters such as:
 - Distance, 2 meters is the value of risk 
 - Time, 15 minutes are enough to make infection happen
 - Social Responsibility (that represents several factors about social behaviours during a pandemic, mainly mask usage and social distancing)
@@ -76,3 +97,13 @@ HOW TO USE
 - W-A-S-D for xy movement on the map 
 
 <br/> 
+
+SIMULATION STATISTICS
+------------
+No restriction simulation:
+
+![alt text](./img/no_Lockdown_Statistics.png)
+
+Lockdown simulation:
+![alt text](./img/Lockdown_Statistics.png)
+
