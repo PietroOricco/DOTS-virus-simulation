@@ -87,8 +87,8 @@ public class Human : MonoBehaviour{
                 sociality = UnityEngine.Random.Range(0, 10 * 60),
                 fatigue = UnityEngine.Random.Range(0, 10 * 60),
                 grocery = UnityEngine.Random.Range(0, 3 * 25 * 60),
-                socialResposibility = conf.lockdown ? GenerateNormalRandom(0.75f, 0.2f, 0.50f, 1f) : GenerateNormalRandom(0.5f, 0.3f, 0f, 1f),
-                jobEssentiality = conf.lockdown ? GenerateNormalRandom(0.1f, 0.1f, 0f, 1f) / 100f : 1,
+                socialResposibility = conf.lockdown ? GenerateNormalRandom(0.95f, 0.05f, 0.50f, 1f) : GenerateNormalRandom(0.5f, 0.3f, 0f, 1f),
+                jobEssentiality = conf.lockdown ? GenerateNormalRandom(0.02f, 0.1f, 0f, 1f) / 100f : 1,
                 homePosition = homePosition,
                 officePosition = officePosition
             }) ;

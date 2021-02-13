@@ -24,13 +24,15 @@ public class ContagionSystem : SystemBase
     EndInitializationEntityCommandBufferSystem m_EndSimulationEcbSystem;
 
     public static long infectedCounter;
+    public static long totalInfectedCounter;
     public static long symptomaticCounter;
     public static long asymptomaticCounter;
     public static long recoveredCounter;
+    public static long totalRecoveredCounter;
     public static long deathCounter;
     public static long populationCounter;
     private StreamWriter writer;
-    public static string logPath = "log.txt";
+    public static string logPath = "statistics/log.txt";
 
     protected override void OnCreate()
     {
@@ -44,7 +46,7 @@ public class ContagionSystem : SystemBase
         deathCounter = 0;
         populationCounter = conf.numberOfHumans;
         writer = new StreamWriter(logPath, false); // false is for overwrite existing file
-        writer.WriteLine("Population\tExposed\tSymptomatic\tAsymptomatic\tDeath\tRecovered\tMinutesPassed");
+        writer.WriteLine("Population\tExposed\tTotalExposed\tSymptomatic\tAsymptomatic\tDeath\tRecovered\tTotalRecovered\tMinutesPassed");
     }
 
     protected override void OnUpdate(){
@@ -55,6 +57,9 @@ public class ContagionSystem : SystemBase
 
         NativeArray<long> localInfectedCounter = new NativeArray<long>(1, Allocator.TempJob);
         localInfectedCounter[0]=0;
+
+        NativeArray<long> localTotalInfectedCounter = new NativeArray<long>(1, Allocator.TempJob);
+        localTotalInfectedCounter[0]=0;
         
         NativeArray<long> localSymptomaticCounter = new NativeArray<long>(1, Allocator.TempJob);
         localSymptomaticCounter[0]=0;
@@ -67,6 +72,9 @@ public class ContagionSystem : SystemBase
 
         NativeArray<long> localRecoveredCounter = new NativeArray<long>(1, Allocator.TempJob);
         localRecoveredCounter[0] = 0;
+
+        NativeArray<long> localTotalRecoveredCounter = new NativeArray<long>(1, Allocator.TempJob);
+        localTotalRecoveredCounter[0] = 0;
 
         //job -> each element, if not infected, check if there are infected in its same quadrant
         var jobHandle = Entities.ForEach((Entity entity, int nativeThreadIndex, Translation t, ref QuadrantEntity qe, ref HumanComponent humanComponent, ref InfectionComponent ic) =>{
@@ -106,6 +114,7 @@ public class ContagionSystem : SystemBase
                 //human become infected
                 unsafe{
                     Interlocked.Increment(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]);
+                    Interlocked.Increment(ref ((long *)localTotalInfectedCounter.GetUnsafePtr())[0]);
                 }
                 qe.typeEnum = QuadrantEntity.TypeEnum.exposed;
                 ic.status = Status.exposed;
@@ -149,10 +158,6 @@ public class ContagionSystem : SystemBase
                     unsafe
                     {
                         Interlocked.Increment(ref ((long*)localDeathCounter.GetUnsafePtr())[0]);
-                    }
- 
-                    unsafe
-                    {
                         Interlocked.Decrement(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]);
                     }
 
@@ -176,10 +181,8 @@ public class ContagionSystem : SystemBase
                     //recovery time set up
                     unsafe{
                         Interlocked.Decrement(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]);
-                    }
-                    unsafe
-                    {
                         Interlocked.Increment(ref ((long*)localRecoveredCounter.GetUnsafePtr())[0]);
+                        Interlocked.Increment(ref ((long*)localTotalRecoveredCounter.GetUnsafePtr())[0]);
                     }
                     if (ic.symptomatic)
                         unsafe
@@ -203,6 +206,9 @@ public class ContagionSystem : SystemBase
             {
                 ic.status = Status.susceptible;
                 qe.typeEnum = QuadrantEntity.TypeEnum.susceptible;
+                unsafe{
+                    Interlocked.Decrement(ref ((long*)localRecoveredCounter.GetUnsafePtr())[0]);
+                }
             }
 
             if (ic.status == Status.exposed)
@@ -227,46 +233,31 @@ public class ContagionSystem : SystemBase
         
         unsafe{
             Interlocked.Add(ref infectedCounter, Interlocked.Read(ref ((long *)localInfectedCounter.GetUnsafePtr())[0]));
-        }
-
-        unsafe
-        {
+            Interlocked.Add(ref totalInfectedCounter, Interlocked.Read(ref ((long *)localTotalInfectedCounter.GetUnsafePtr())[0]));
             Interlocked.Add(ref symptomaticCounter, Interlocked.Read(ref ((long*)localSymptomaticCounter.GetUnsafePtr())[0]));
-        }
-
-        unsafe
-        {
             Interlocked.Add(ref asymptomaticCounter, Interlocked.Read(ref ((long*)localAsymptomaticCounter.GetUnsafePtr())[0]));
-        }
-
-        unsafe
-        {
             Interlocked.Add(ref recoveredCounter, Interlocked.Read(ref ((long*)localRecoveredCounter.GetUnsafePtr())[0]));
-        }
-
-        unsafe
-        {
             Interlocked.Add(ref deathCounter, Interlocked.Read(ref ((long*)localDeathCounter.GetUnsafePtr())[0]));
-        }
-
-        unsafe
-        {
             Interlocked.Add(ref populationCounter, -Interlocked.Read(ref ((long*)localDeathCounter.GetUnsafePtr())[0]));
         }
 
         //Write some text to the test.txt file
         writer.WriteLine(Interlocked.Read(ref populationCounter)+"\t"
                             +Interlocked.Read(ref infectedCounter)+"\t"
+                            +Interlocked.Read(ref totalInfectedCounter)+"\t"
                             +Interlocked.Read(ref symptomaticCounter)+"\t"
                             +Interlocked.Read(ref asymptomaticCounter)+"\t"
                             +Interlocked.Read(ref deathCounter)+"\t"
                             +Interlocked.Read(ref recoveredCounter)+"\t"
-                            +Datetime.total_minutes);
+                            +Interlocked.Read(ref totalRecoveredCounter)+"\t"
+                            +(int)Datetime.total_minutes);
 
         localInfectedCounter.Dispose();
+        localTotalInfectedCounter.Dispose();
         localAsymptomaticCounter.Dispose();
         localSymptomaticCounter.Dispose();
         localRecoveredCounter.Dispose();
+        localTotalRecoveredCounter.Dispose();
         localDeathCounter.Dispose();
     }
 

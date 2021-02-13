@@ -67,8 +67,8 @@ public class HumanSystem : SystemBase{
                     hc.fatigue = math.min(hc.fatigue + 1f * deltaTime, 17 * 60);
                     hc.work = math.min(hc.work + hc.jobEssentiality * deltaTime, 17 * 60);
                     hc.grocery = math.min(hc.grocery + 0.5f * deltaTime, 3 * 25 * 60);
-                    hc.sociality = math.min(hc.sociality + (1-hc.socialResposibility)*0.5f * deltaTime, 11 * 60);
-                    hc.sportivity = math.min(hc.sportivity + (1 - hc.socialResposibility) * 0.5f * deltaTime, 23 * 60);
+                    hc.sociality = math.min(hc.sociality + (1-hc.socialResposibility)*0.1f * deltaTime, 11 * 60);
+                    hc.sportivity = math.min(hc.sportivity + (1 - hc.socialResposibility) * 0.1f * deltaTime, 23 * 60);
                 }
                 
             }
