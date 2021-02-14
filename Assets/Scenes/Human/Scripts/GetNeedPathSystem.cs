@@ -85,7 +85,7 @@ public class GetNeedPathSystem : SystemBase {
 					result[0]=TileMapEnum.TileMapSprite.Supermarket;
 					break;
 				case NeedType.needForSociality:
-					if((rnd.NextDouble()<0.20&&!lockdown)||(rnd.NextDouble()<0.20*humanComponent.socialResposibility&&lockdown)){
+					if((rnd.NextDouble()<0.20&&!lockdown)||(rnd.NextDouble()<0.05*(1-humanComponent.socialResposibility)&&lockdown)){
 						result = new NativeArray<TileMapEnum.TileMapSprite>(0, Allocator.Temp);
 						found = true;
 						int friendIndex;
