@@ -100,10 +100,10 @@ HOW TO USE
 
 SIMULATION STATISTICS
 ------------
-No restriction simulation:
+No restriction simulation example:
 
-![alt text](./img/no_Lockdown_Statistics.png)
+![alt text](./img/Statistics_no_lockdown_30000.png)
 
-Lockdown simulation:
-![alt text](./img/Lockdown_Statistics.png)
+Lockdown simulation example:
+![alt text](./img/Statistics_lockdown_30000.png)
 
